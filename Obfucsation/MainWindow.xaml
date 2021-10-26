@@ -1,0 +1,42 @@
+﻿<Window x:Class="Obfucsation.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="600" Width="920"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        Background="Transparent"
+        AllowsTransparency="True">
+    <Border Background="Beige">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            
+            <StackPanel Orientation="Vertical">
+                <TextBlock Text="Obfuscation options"></TextBlock>  
+            </StackPanel>
+            
+            <TabControl Grid.Column="1">
+                <TabItem Header="Obfuscation">
+                    <StackPanel>
+                        <Label Content="Obfuscation label"></Label>
+                        <Border Background="Chocolate"
+                                Width="150"
+                                Height="150" />
+                    </StackPanel>
+                </TabItem>
+                <TabItem Header="Deobfuscation">
+                    <StackPanel>
+                        <Border Background="Fuchsia"
+                                Width="200"
+                                Height="200"></Border>
+                    </StackPanel>
+                </TabItem>
+            </TabControl>
+        </Grid>
+    </Border>
+</Window>
