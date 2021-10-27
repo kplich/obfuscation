@@ -4,6 +4,14 @@
              xmlns:local="clr-namespace:Obfucsation"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Theme/ObfuscationPanel.xaml" />
+                <ResourceDictionary Source="Theme/ObfuscationRichTextBox.xaml" />
+                <ResourceDictionary Source="Theme/ObfuscationHeader.xaml" />
+                <ResourceDictionary Source="Theme/ObfuscationHeaderLabel.xaml" />
+                <ResourceDictionary Source="Theme/ObfuscationHeaderButton.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

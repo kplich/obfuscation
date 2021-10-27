@@ -1,0 +1,9 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Style TargetType="{x:Type RichTextBox}"
+           x:Key="ObfuscationRichTextBoxTheme">
+        <Style.Setters>
+            <Setter Property="Height" Value="490"></Setter>
+        </Style.Setters>
+    </Style>
+</ResourceDictionary>

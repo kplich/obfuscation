@@ -4,12 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="920"
+        Title="MainWindow" Height="600" Width="1200"
         WindowStyle="None"
         ResizeMode="NoResize"
         Background="Transparent"
         AllowsTransparency="True">
-    <Border Background="Beige">
+    <Border Background="Gainsboro">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="200" />
@@ -17,23 +17,82 @@
             </Grid.ColumnDefinitions>
             
             <StackPanel Orientation="Vertical">
-                <TextBlock Text="Obfuscation options"></TextBlock>  
+                <TextBlock Text="Obfuscation options"
+                           FontSize="20"
+                           TextAlignment="Center"
+                           Margin="10"
+                           TextWrapping="Wrap"/>
             </StackPanel>
             
             <TabControl Grid.Column="1">
                 <TabItem Header="Obfuscation">
-                    <StackPanel>
-                        <Label Content="Obfuscation label"></Label>
-                        <Border Background="Chocolate"
-                                Width="150"
-                                Height="150" />
-                    </StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <StackPanel Grid.Column="0"
+                                    Style="{StaticResource ObfuscationPanelTheme}">
+                            <Grid Style="{StaticResource ObfuscationHeaderTheme}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <Label Grid.Column="0" Style="{StaticResource ObfuscationHeaderLabelTheme}">
+                                    Original code
+                                </Label>
+                                <Button Grid.Column="1" Style="{StaticResource ObfuscationHeaderButtonTheme}">
+                                    Load code
+                                </Button>
+                                <Button Grid.Column="2" Style="{StaticResource ObfuscationHeaderButtonTheme}">
+                                    Obfuscate code
+                                </Button>
+                            </Grid>
+                            <RichTextBox Style="{StaticResource ObfuscationRichTextBoxTheme}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1"
+                                    Style="{StaticResource ObfuscationPanelTheme}">
+                            <Grid Style="{StaticResource ObfuscationHeaderTheme}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <Label Grid.Column="0" Style="{StaticResource ObfuscationHeaderLabelTheme}">
+                                    Obfuscated code
+                                </Label>
+                                <Button Grid.Column="1" Style="{StaticResource ObfuscationHeaderButtonTheme}">
+                                    Save obfuscated code
+                                </Button>
+                            </Grid>
+                            <RichTextBox Style="{StaticResource ObfuscationRichTextBoxTheme}" 
+                                         IsEnabled="False"/>
+                        </StackPanel>
+                    </Grid>
                 </TabItem>
                 <TabItem Header="Deobfuscation">
-                    <StackPanel>
-                        <Border Background="Fuchsia"
-                                Width="200"
-                                Height="200"></Border>
+                    <StackPanel Style="{StaticResource ObfuscationPanelTheme}">
+                        <Grid Style="{StaticResource ObfuscationHeaderTheme}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                                
+                            <Label Grid.Column="0" Style="{StaticResource ObfuscationHeaderLabelTheme}">
+                                Analyzed code
+                            </Label>
+                            <Button Grid.Column="1" Style="{StaticResource ObfuscationHeaderButtonTheme}">
+                                Load code
+                            </Button>
+                            <Button Grid.Column="2" Style="{StaticResource ObfuscationHeaderButtonTheme}">
+                                Analyze code
+                            </Button>
+                        </Grid>
+                        <RichTextBox Style="{StaticResource ObfuscationRichTextBoxTheme}" />
                     </StackPanel>
                 </TabItem>
             </TabControl>

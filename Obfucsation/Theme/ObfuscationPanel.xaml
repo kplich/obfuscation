@@ -1,0 +1,11 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Style TargetType="{x:Type StackPanel}"
+           x:Key="ObfuscationPanelTheme">
+        <Style.Setters>
+            <Setter Property="Margin" Value="20, 10"></Setter>
+            <Setter Property="Orientation" Value="Vertical" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+        </Style.Setters>
+    </Style>
+</ResourceDictionary>
