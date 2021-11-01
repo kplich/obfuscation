@@ -24,7 +24,7 @@
                     Analyze code
                 </Button>
             </Grid>
-            <RichTextBox Style="{StaticResource ObfuscationRichTextBoxTheme}" />
+            <TextBox Style="{StaticResource ObfuscationTextBoxTheme}" />
         </StackPanel>
     </Grid>
 </UserControl>
