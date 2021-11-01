@@ -3,8 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:viewModel="clr-namespace:Obfucsation.MVVM.ViewModel"
-        xmlns:view="clr-namespace:Obfucsation.MVVM.View"
+        xmlns:core="clr-namespace:Obfucsation.Core"
+        xmlns:obfuscation="clr-namespace:Obfucsation.Controls.Obfuscation"
+        xmlns:analysis="clr-namespace:Obfucsation.Controls.Analysis"
+        xmlns:local="clr-namespace:Obfucsation"
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="1200"
         WindowStyle="SingleBorderWindow"
@@ -12,22 +14,22 @@
         Background="Gainsboro">
     
     <Window.DataContext>
-        <viewModel:MainViewModel />
+        <local:MainViewModel />
     </Window.DataContext>
     
     <Border>
         <TabControl ItemsSource="{Binding Tabs}">
             <TabControl.Resources>
-                <DataTemplate DataType="{x:Type viewModel:ObfuscationViewModel}">
-                    <view:ObfuscationView />
+                <DataTemplate DataType="{x:Type obfuscation:ObfuscationViewModel}">
+                    <obfuscation:ObfuscationView />
                 </DataTemplate>
-                <DataTemplate DataType="{x:Type viewModel:AnalysisViewModel}">
-                    <view:AnalysisView />
+                <DataTemplate DataType="{x:Type analysis:AnalysisViewModel}">
+                    <analysis:AnalysisView />
                 </DataTemplate>
             </TabControl.Resources>
             
             <TabControl.ItemTemplate>
-                <DataTemplate DataType="{x:Type viewModel:TabViewModel}">
+                <DataTemplate DataType="{x:Type core:TabViewModel}">
                     <TextBlock>
                         <Run Text="{Binding Name}"></Run>
                     </TextBlock>

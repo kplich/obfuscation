@@ -1,4 +1,4 @@
-﻿namespace Obfucsation.MVVM.ViewModel
+﻿namespace Obfucsation.Core
 {
     public class TabViewModel
     {

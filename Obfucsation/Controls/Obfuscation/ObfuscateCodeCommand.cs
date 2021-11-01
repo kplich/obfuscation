@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
-using Obfucsation.MVVM.ViewModel;
 
-namespace Obfucsation.MVVM.Commands
+namespace Obfucsation.Controls.Obfuscation
 {
     internal class ObfuscateCodeCommand : ICommand
     {

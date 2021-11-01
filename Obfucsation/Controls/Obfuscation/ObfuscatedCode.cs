@@ -2,9 +2,9 @@
 using System.Runtime.CompilerServices;
 using Obfucsation.Annotations;
 
-namespace Obfucsation.MVVM.Model
+namespace Obfucsation.Controls.Obfuscation
 {
-    public class ObfuscatedCode : INotifyPropertyChanged
+    public sealed class ObfuscatedCode : INotifyPropertyChanged
     {
         private string _original;
         
@@ -39,7 +39,7 @@ namespace Obfucsation.MVVM.Model
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

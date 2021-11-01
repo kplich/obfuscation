@@ -1,11 +1,8 @@
-﻿using System;
-using System.IO;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Input;
-using Obfucsation.MVVM.Commands;
-using Obfucsation.MVVM.Model;
+using Obfucsation.Core;
 
-namespace Obfucsation.MVVM.ViewModel
+namespace Obfucsation.Controls.Obfuscation
 {
     public class ObfuscationViewModel : TabViewModel
     {

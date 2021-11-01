@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace Obfucsation.MVVM.View
+namespace Obfucsation.Controls.Obfuscation
 {
     public partial class ObfuscationView : UserControl
     {

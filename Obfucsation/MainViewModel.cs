@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Obfucsation.Controls.Analysis;
+using Obfucsation.Controls.Obfuscation;
+using Obfucsation.Core;
 
-namespace Obfucsation.MVVM.ViewModel
+namespace Obfucsation
 {
     public class MainViewModel
     {

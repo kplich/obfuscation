@@ -1,4 +1,6 @@
-﻿namespace Obfucsation.MVVM.ViewModel
+﻿using Obfucsation.Core;
+
+namespace Obfucsation.Controls.Analysis
 {
     public class AnalysisViewModel : TabViewModel
     {

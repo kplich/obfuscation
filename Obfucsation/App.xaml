@@ -6,7 +6,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Theme/ObfuscationPanel.xaml" />
-                <ResourceDictionary Source="Theme/ObfuscationRichTextBox.xaml" />
+                <ResourceDictionary Source="Theme/ObfuscationTextBox.xaml" />
                 <ResourceDictionary Source="Theme/ObfuscationHeader.xaml" />
                 <ResourceDictionary Source="Theme/ObfuscationHeaderLabel.xaml" />
                 <ResourceDictionary Source="Theme/ObfuscationHeaderButton.xaml"/>
