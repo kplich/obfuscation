@@ -3,99 +3,36 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModel="clr-namespace:Obfucsation.MVVM.ViewModel"
+        xmlns:view="clr-namespace:Obfucsation.MVVM.View"
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="1200"
-        WindowStyle="None"
+        WindowStyle="SingleBorderWindow"
         ResizeMode="NoResize"
-        Background="Transparent"
-        AllowsTransparency="True">
-    <Border Background="Gainsboro">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200" />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
+        Background="Gainsboro">
+    
+    <Window.DataContext>
+        <viewModel:MainViewModel />
+    </Window.DataContext>
+    
+    <Border>
+        <TabControl ItemsSource="{Binding Tabs}">
+            <TabControl.Resources>
+                <DataTemplate DataType="{x:Type viewModel:ObfuscationViewModel}">
+                    <view:ObfuscationView />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type viewModel:AnalysisViewModel}">
+                    <view:AnalysisView />
+                </DataTemplate>
+            </TabControl.Resources>
             
-            <StackPanel Orientation="Vertical">
-                <TextBlock Text="Obfuscation options"
-                           FontSize="20"
-                           TextAlignment="Center"
-                           Margin="10"
-                           TextWrapping="Wrap"/>
-            </StackPanel>
-            
-            <TabControl Grid.Column="1">
-                <TabItem Header="Obfuscation">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        
-                        <StackPanel Grid.Column="0"
-                                    Style="{StaticResource ObfuscationPanelTheme}">
-                            <Grid Style="{StaticResource ObfuscationHeaderTheme}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                
-                                <Label Grid.Column="0" Style="{StaticResource ObfuscationHeaderLabelTheme}">
-                                    Original code
-                                </Label>
-                                <Button Grid.Column="1" Style="{StaticResource ObfuscationHeaderButtonTheme}">
-                                    Load code
-                                </Button>
-                                <Button Grid.Column="2" Style="{StaticResource ObfuscationHeaderButtonTheme}">
-                                    Obfuscate code
-                                </Button>
-                            </Grid>
-                            <RichTextBox Style="{StaticResource ObfuscationRichTextBoxTheme}" />
-                        </StackPanel>
-                        <StackPanel Grid.Column="1"
-                                    Style="{StaticResource ObfuscationPanelTheme}">
-                            <Grid Style="{StaticResource ObfuscationHeaderTheme}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                
-                                <Label Grid.Column="0" Style="{StaticResource ObfuscationHeaderLabelTheme}">
-                                    Obfuscated code
-                                </Label>
-                                <Button Grid.Column="1" Style="{StaticResource ObfuscationHeaderButtonTheme}">
-                                    Save obfuscated code
-                                </Button>
-                            </Grid>
-                            <RichTextBox Style="{StaticResource ObfuscationRichTextBoxTheme}" 
-                                         IsEnabled="False"/>
-                        </StackPanel>
-                    </Grid>
-                </TabItem>
-                <TabItem Header="Deobfuscation">
-                    <StackPanel Style="{StaticResource ObfuscationPanelTheme}">
-                        <Grid Style="{StaticResource ObfuscationHeaderTheme}">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                                
-                            <Label Grid.Column="0" Style="{StaticResource ObfuscationHeaderLabelTheme}">
-                                Analyzed code
-                            </Label>
-                            <Button Grid.Column="1" Style="{StaticResource ObfuscationHeaderButtonTheme}">
-                                Load code
-                            </Button>
-                            <Button Grid.Column="2" Style="{StaticResource ObfuscationHeaderButtonTheme}">
-                                Analyze code
-                            </Button>
-                        </Grid>
-                        <RichTextBox Style="{StaticResource ObfuscationRichTextBoxTheme}" />
-                    </StackPanel>
-                </TabItem>
-            </TabControl>
-        </Grid>
+            <TabControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type viewModel:TabViewModel}">
+                    <TextBlock>
+                        <Run Text="{Binding Name}"></Run>
+                    </TextBlock>
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+        </TabControl>
     </Border>
 </Window>
