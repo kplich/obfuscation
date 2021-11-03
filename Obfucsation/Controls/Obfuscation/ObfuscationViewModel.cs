@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Input;
+using Microsoft.CodeAnalysis.CSharp;
 using Obfucsation.Core;
 
 namespace Obfucsation.Controls.Obfuscation
@@ -22,7 +23,12 @@ namespace Obfucsation.Controls.Obfuscation
 
         public void PerformCodeObfuscation()
         {
-            Code.Obfuscated = Code.Original + " ;)";
+            var tree = CSharpSyntaxTree.ParseText(Code.Original);
+            var classRenamer = new RandomClassRenamer();
+
+            var result1 = classRenamer.Visit(tree.GetRoot());
+
+            Code.Obfuscated = result1.ToFullString();
         }
 
         #endregion

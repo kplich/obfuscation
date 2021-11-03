@@ -7,8 +7,6 @@ namespace Obfucsation.Controls.Obfuscation
     public sealed class ObfuscatedCode : INotifyPropertyChanged
     {
         private string _original;
-        
-
         public string Original
         {
             get => _original;

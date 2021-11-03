@@ -5,7 +5,7 @@
         <Style.Setters>
             <Setter Property="Margin" Value="20, 10"></Setter>
             <Setter Property="Orientation" Value="Vertical" />
-            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
         </Style.Setters>
     </Style>
 </ResourceDictionary>

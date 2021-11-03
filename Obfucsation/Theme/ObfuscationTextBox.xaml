@@ -3,7 +3,13 @@
     <Style TargetType="{x:Type TextBox}"
            x:Key="ObfuscationTextBoxTheme">
         <Style.Setters>
-            <Setter Property="Height" Value="490"></Setter>
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="Height" Value="Auto" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="AcceptsReturn" Value="True" />
+            <Setter Property="AcceptsTab" Value="True" />
+            <Setter Property="FontFamily" Value="JetBrains Mono" />
+            
         </Style.Setters>
     </Style>
 </ResourceDictionary>
