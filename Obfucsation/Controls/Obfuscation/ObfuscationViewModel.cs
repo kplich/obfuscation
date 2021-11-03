@@ -1,6 +1,8 @@
-﻿using System.Windows;
+﻿using System.IO;
+using System.Windows;
 using System.Windows.Input;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.Win32;
 using Obfucsation.Core;
 
 namespace Obfucsation.Controls.Obfuscation
@@ -13,9 +15,23 @@ namespace Obfucsation.Controls.Obfuscation
         {
             Code = new ObfuscatedCode();
             Obfuscate = new ObfuscateCodeCommand(this);
+            LoadCode = new LoadCodeCommand(this);
             SaveObfuscatedCode = new SaveObfuscatedCodeCommand(this);
         }
-        
+
+        #region 'Load code' button
+        public ICommand LoadCode { get; }
+        public void LoadCodeFromFile()
+        {
+            var openFileDialog = new OpenFileDialog();
+            if (openFileDialog.ShowDialog() == true)
+            {
+                Code.Original = File.ReadAllText(openFileDialog.FileName);
+            }
+        }
+
+        #endregion
+
         #region 'Obfuscate code' button
 
         public ICommand Obfuscate { get; }
@@ -32,15 +48,17 @@ namespace Obfucsation.Controls.Obfuscation
         }
 
         #endregion
-        
+
         #region 'Save obfuscated code' button
+
         public ICommand SaveObfuscatedCode { get; }
         public bool ObfuscatedCodeCanBeSaved => !string.IsNullOrWhiteSpace(Code.Obfuscated);
+
         public void SaveObfuscatedCodeToFile()
-        { 
+        {
             MessageBox.Show(Code.Obfuscated, "Saved obfuscated code!");
         }
-        
+
         #endregion
     }
 }

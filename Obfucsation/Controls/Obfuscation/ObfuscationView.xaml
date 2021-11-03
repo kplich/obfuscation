@@ -6,24 +6,24 @@
              xmlns:obfuscation="clr-namespace:Obfucsation.Controls.Obfuscation"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
-    
+
     <UserControl.DataContext>
-        <obfuscation:ObfuscationViewModel/>
+        <obfuscation:ObfuscationViewModel />
     </UserControl.DataContext>
-    
+
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*"/>
-            <ColumnDefinition Width="4*"/>
-            <ColumnDefinition Width="4*"/>
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="4*" />
+            <ColumnDefinition Width="4*" />
         </Grid.ColumnDefinitions>
-        
+
         <StackPanel Orientation="Vertical">
             <TextBlock Text="Obfuscation options"
                        FontSize="20"
                        TextAlignment="Center"
                        Margin="10"
-                       TextWrapping="Wrap"/>
+                       TextWrapping="Wrap" />
         </StackPanel>
 
         <StackPanel Grid.Column="1"
@@ -38,7 +38,9 @@
                 <Label Grid.Column="0" Style="{StaticResource ObfuscationHeaderLabelTheme}">
                     Original code
                 </Label>
-                <Button Grid.Column="1" Style="{StaticResource ObfuscationHeaderButtonTheme}">
+                <Button Grid.Column="1" 
+                        Style="{StaticResource ObfuscationHeaderButtonTheme}"
+                        Command="{Binding LoadCode}">
                     Load code
                 </Button>
                 <Button Grid.Column="2"
@@ -48,7 +50,7 @@
                 </Button>
             </Grid>
             <TextBox Style="{StaticResource ObfuscationTextBoxTheme}"
-                     Text="{Binding Code.Original, UpdateSourceTrigger=PropertyChanged}"/>
+                     Text="{Binding Code.Original, UpdateSourceTrigger=PropertyChanged}" />
         </StackPanel>
         <StackPanel Grid.Column="2"
                     Style="{StaticResource ObfuscationPanelTheme}">
@@ -67,9 +69,9 @@
                     Save obfuscated code
                 </Button>
             </Grid>
-            <TextBox IsEnabled="False" 
+            <TextBox IsEnabled="False"
                      Style="{StaticResource ObfuscationTextBoxTheme}"
-                     Text="{Binding Code.Obfuscated, UpdateSourceTrigger=PropertyChanged}"/>
+                     Text="{Binding Code.Obfuscated, UpdateSourceTrigger=PropertyChanged}" />
         </StackPanel>
     </Grid>
 </UserControl>
