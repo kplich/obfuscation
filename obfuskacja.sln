@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Obfucsation", "Obfucsation\Obfucsation.csproj", "{17094953-102A-4086-B051-43DBA5245498}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Obfuscation", "Obfuscation\Obfuscation.csproj", "{17094953-102A-4086-B051-43DBA5245498}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

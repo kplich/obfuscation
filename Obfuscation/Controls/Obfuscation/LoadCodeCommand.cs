@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace Obfucsation.Controls.Obfuscation
+namespace Obfuscation.Controls.Obfuscation
 {
     internal class LoadCodeCommand : ICommand
     {

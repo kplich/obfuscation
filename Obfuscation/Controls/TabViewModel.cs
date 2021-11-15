@@ -1,4 +1,4 @@
-﻿namespace Obfucsation.Core
+﻿namespace Obfuscation.Core
 {
     public class TabViewModel
     {

@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Obfucsation.Controls.Analysis;
-using Obfucsation.Controls.Obfuscation;
-using Obfucsation.Core;
+using Obfuscation.Controls.Analysis;
+using Obfuscation.Controls.Obfuscation;
+using Obfuscation.Core;
 
-namespace Obfucsation
+namespace Obfuscation
 {
     public class MainViewModel
     {

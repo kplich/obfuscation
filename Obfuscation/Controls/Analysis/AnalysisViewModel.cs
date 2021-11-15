@@ -1,6 +1,6 @@
-﻿using Obfucsation.Core;
+﻿using Obfuscation.Core;
 
-namespace Obfucsation.Controls.Analysis
+namespace Obfuscation.Controls.Analysis
 {
     public class AnalysisViewModel : TabViewModel
     {

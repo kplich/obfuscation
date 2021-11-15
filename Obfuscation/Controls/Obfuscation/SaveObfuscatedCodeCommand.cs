@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace Obfucsation.Controls.Obfuscation
+namespace Obfuscation.Controls.Obfuscation
 {
     public class SaveObfuscatedCodeCommand: ICommand
     {

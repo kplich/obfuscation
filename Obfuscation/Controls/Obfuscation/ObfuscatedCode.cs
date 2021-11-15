@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Obfucsation.Annotations;
+using Obfuscation.Annotations;
 
-namespace Obfucsation.Controls.Obfuscation
+namespace Obfuscation.Controls.Obfuscation
 {
     public sealed class ObfuscatedCode : INotifyPropertyChanged
     {

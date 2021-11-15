@@ -1,11 +1,11 @@
 ﻿using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.Win32;
-using Obfucsation.Core;
+using Obfuscation.Core;
 
-namespace Obfucsation.Controls.Obfuscation
+namespace Obfuscation.Controls.Obfuscation
 {
     public class ObfuscationViewModel : TabViewModel
     {
@@ -37,14 +37,9 @@ namespace Obfucsation.Controls.Obfuscation
         public ICommand Obfuscate { get; }
         public bool CodeCanBeObfuscated => !string.IsNullOrWhiteSpace(Code.Original);
 
-        public void PerformCodeObfuscation()
+        public async Task PerformCodeObfuscation()
         {
-            var tree = CSharpSyntaxTree.ParseText(Code.Original);
-            var classRenamer = new RandomClassRenamer();
-
-            var result1 = classRenamer.Visit(tree.GetRoot());
-
-            Code.Obfuscated = result1.ToFullString();
+            Code.Obfuscated = await Code.Original.RewriteCodeAsync(new RandomClassRenamer());
         }
 
         #endregion

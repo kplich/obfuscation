@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Obfucsation
+namespace Obfuscation
 {
     /// <summary>
     /// Interaction logic for App.xaml

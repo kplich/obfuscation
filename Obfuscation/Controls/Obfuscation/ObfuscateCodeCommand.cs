@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace Obfucsation.Controls.Obfuscation
+namespace Obfuscation.Controls.Obfuscation
 {
     internal class ObfuscateCodeCommand : ICommand
     {
@@ -25,9 +26,9 @@ namespace Obfucsation.Controls.Obfuscation
             return _viewModel.CodeCanBeObfuscated;
         }
 
-        public void Execute(object parameter)
+        public async void Execute(object parameter)
         {
-            _viewModel.PerformCodeObfuscation();
+            await _viewModel.PerformCodeObfuscation();
         }
 
         #endregion
