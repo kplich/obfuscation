@@ -39,7 +39,10 @@ namespace Obfuscation.Controls.Obfuscation
 
         public async Task PerformCodeObfuscation()
         {
-            Code.Obfuscated = await Code.Original.RewriteCodeAsync(new RandomClassRenamer());
+            Code.Obfuscated = await Code.Original
+                .RewriteCodeAsync<RandomClassRenamer>()
+                .RewriteCodeAsync<RandomMethodRenamer>()
+                .RewriteCodeAsync<RandomVariableRenamer>();
         }
 
         #endregion

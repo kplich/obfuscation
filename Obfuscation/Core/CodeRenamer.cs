@@ -9,28 +9,28 @@ namespace Obfuscation.Core
 {
     public static class CodeRewriterUtils
     {
-        public static async Task<string> RewriteCodeAsync<T>(this string code) where T : CodeRewriter, new()
+        public static async Task<string> RewriteCodeAsync<T>(this string code) where T : CodeRenamer, new()
         {
             return await new T().ModifyCode(code).ConfigureAwait(false);
         }
 
-        public static async Task<string> RewriteCodeAsync<T>(this Task<string> codeAsync) where T : CodeRewriter, new()
+        public static async Task<string> RewriteCodeAsync<T>(this Task<string> codeAsync) where T : CodeRenamer, new()
         {
             return await new T().ModifyCode(await codeAsync).ConfigureAwait(false);
         }
 
-        public static async Task<string> RewriteCodeAsync(this string code, CodeRewriter rewriter)
+        public static async Task<string> RewriteCodeAsync(this string code, CodeRenamer renamer)
         {
-            return await rewriter.ModifyCode(code).ConfigureAwait(false);
+            return await renamer.ModifyCode(code).ConfigureAwait(false);
         }
 
-        public static async Task<string> RewriteCodeAsync(this Task<string> codeAsync, CodeRewriter rewriter)
+        public static async Task<string> RewriteCodeAsync(this Task<string> codeAsync, CodeRenamer renamer)
         {
-            return await rewriter.ModifyCode(await codeAsync).ConfigureAwait(false);
+            return await renamer.ModifyCode(await codeAsync).ConfigureAwait(false);
         }
     }
     
-    public abstract class CodeRewriter
+    public abstract class CodeRenamer
     {
         public abstract Task<Solution> RewriteCode(Solution solution, SyntaxTree syntaxTree, SemanticModel semanticModel);
 

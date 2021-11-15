@@ -7,19 +7,19 @@ using Microsoft.CodeAnalysis.Rename;
 
 namespace Obfuscation.Core
 {
-    public class RandomClassRenamer : CodeRenamer
+    public class RandomMethodRenamer : CodeRenamer
     {
         public override async Task<Solution> RewriteCode(Solution solution, SyntaxTree syntaxTree, SemanticModel semanticModel)
         {
-            var classDeclarations = (await syntaxTree.GetRootAsync()).DescendantNodes().OfType<ClassDeclarationSyntax>();
-            var classSymbols
-                = classDeclarations
-                    .Select(classDeclaration => semanticModel.GetDeclaredSymbol(classDeclaration))
+            var methodDeclarations = (await syntaxTree.GetRootAsync()).DescendantNodes().OfType<MethodDeclarationSyntax>();
+            var methodSymbols
+                = methodDeclarations
+                    .Select(methodDeclaration => semanticModel.GetDeclaredSymbol(methodDeclaration)!)
                     .Where(symbol => symbol != null);
             
-            foreach (var classSymbol in classSymbols)
+            foreach (var methodSymbol in methodSymbols)
             {
-                solution = await Renamer.RenameSymbolAsync(solution, classSymbol,
+                solution = await Renamer.RenameSymbolAsync(solution, methodSymbol,
                     Guid.NewGuid().ToString().Replace("-", "").Insert(0, "_"), solution.Workspace.Options);
             }
 
