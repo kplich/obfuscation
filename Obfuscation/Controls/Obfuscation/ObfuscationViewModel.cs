@@ -10,11 +10,14 @@ namespace Obfuscation.Controls.Obfuscation
     public class ObfuscationViewModel : TabViewModel
     {
         public ObfuscatedCode Code { get; }
+        public ObfuscationOptions Options { get; }
 
         public ObfuscationViewModel() : base("Obfuscation")
         {
             Code = new ObfuscatedCode();
-            Obfuscate = new ObfuscateCodeCommand(this);
+            Options = new ObfuscationOptions();
+            
+            ObfuscateCode = new ObfuscateCodeCommand(this);
             LoadCode = new LoadCodeCommand(this);
             SaveObfuscatedCode = new SaveObfuscatedCodeCommand(this);
         }
@@ -34,15 +37,29 @@ namespace Obfuscation.Controls.Obfuscation
 
         #region 'Obfuscate code' button
 
-        public ICommand Obfuscate { get; }
+        public ICommand ObfuscateCode { get; }
         public bool CodeCanBeObfuscated => !string.IsNullOrWhiteSpace(Code.Original);
 
         public async Task PerformCodeObfuscation()
         {
-            Code.Obfuscated = await Code.Original
-                .RewriteCodeAsync<RandomClassRenamer>()
-                .RewriteCodeAsync<RandomMethodRenamer>()
-                .RewriteCodeAsync<RandomVariableRenamer>();
+            var obfuscatedCode = Code.Original;
+            
+            if (Options.RenameClasses)
+            {
+                obfuscatedCode = await obfuscatedCode.RewriteCodeAsync<RandomClassRenamer>();
+            }
+
+            if (Options.RenameMethods)
+            {
+                obfuscatedCode = await obfuscatedCode.RewriteCodeAsync<RandomMethodRenamer>();
+            }
+
+            if (Options.RenameVariables)
+            {
+                obfuscatedCode = await obfuscatedCode.RewriteCodeAsync<RandomVariableRenamer>();
+            }
+
+            Code.Obfuscated = obfuscatedCode;
         }
 
         #endregion

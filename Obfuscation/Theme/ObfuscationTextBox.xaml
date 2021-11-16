@@ -4,12 +4,14 @@
            x:Key="ObfuscationTextBoxTheme">
         <Style.Setters>
             <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
             <Setter Property="Height" Value="Auto" />
-            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="TextWrapping" Value="NoWrap" />
             <Setter Property="AcceptsReturn" Value="True" />
             <Setter Property="AcceptsTab" Value="True" />
             <Setter Property="FontFamily" Value="JetBrains Mono" />
-            
+            <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
         </Style.Setters>
     </Style>
 </ResourceDictionary>

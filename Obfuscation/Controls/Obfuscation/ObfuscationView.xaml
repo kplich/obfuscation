@@ -5,7 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:obfuscation="clr-namespace:Obfuscation.Controls.Obfuscation"
              mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="600" d:DesignWidth="1200
+             ">
 
     <UserControl.DataContext>
         <obfuscation:ObfuscationViewModel />
@@ -13,22 +14,38 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="2*" MaxWidth="250" />
             <ColumnDefinition Width="4*" />
             <ColumnDefinition Width="4*" />
         </Grid.ColumnDefinitions>
 
         <StackPanel Orientation="Vertical">
-            <TextBlock Text="Obfuscation options"
-                       FontSize="20"
+            <TextBlock
+                FontSize="20"
                        TextAlignment="Center"
                        Margin="10"
-                       TextWrapping="Wrap" />
+                       TextWrapping="Wrap">
+                Obfuscation options
+            </TextBlock>
+            <Expander Header="Renaming" Margin="5">
+                <StackPanel Margin="5">
+                    <CheckBox IsChecked="{Binding Options.RenameClasses}" Margin="5">
+                        Rename classes
+                    </CheckBox>
+                    <CheckBox IsChecked="{Binding Options.RenameMethods}" Margin="5">
+                        Rename methods
+                    </CheckBox>
+                    <CheckBox IsChecked="{Binding Options.RenameVariables}" Margin="5 5 5 0">
+                        Rename variables
+                    </CheckBox>
+                </StackPanel>
+            </Expander>
+            <Separator Margin="5" />
         </StackPanel>
 
-        <StackPanel Grid.Column="1"
-                    Style="{StaticResource ObfuscationPanelTheme}">
-            <Grid Style="{StaticResource ObfuscationHeaderTheme}">
+        <DockPanel Grid.Column="1"
+                   Style="{StaticResource ObfuscationPanelTheme}">
+            <Grid Style="{StaticResource ObfuscationHeaderTheme}" DockPanel.Dock="Top">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
                     <ColumnDefinition Width="Auto" />
@@ -45,16 +62,17 @@
                 </Button>
                 <Button Grid.Column="2"
                         Style="{StaticResource ObfuscationHeaderButtonTheme}"
-                        Command="{Binding Obfuscate}">
+                        Command="{Binding ObfuscateCode}">
                     Obfuscate code
                 </Button>
             </Grid>
             <TextBox Style="{StaticResource ObfuscationTextBoxTheme}"
-                     Text="{Binding Code.Original, UpdateSourceTrigger=PropertyChanged}" />
-        </StackPanel>
-        <StackPanel Grid.Column="2"
+                     Text="{Binding Code.Original, UpdateSourceTrigger=PropertyChanged}"
+                     DockPanel.Dock="Top" />
+        </DockPanel>
+        <DockPanel Grid.Column="2"
                     Style="{StaticResource ObfuscationPanelTheme}">
-            <Grid Style="{StaticResource ObfuscationHeaderTheme}">
+            <Grid Style="{StaticResource ObfuscationHeaderTheme}" DockPanel.Dock="Top">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
                     <ColumnDefinition Width="Auto" />
@@ -69,9 +87,10 @@
                     Save obfuscated code
                 </Button>
             </Grid>
-            <TextBox IsEnabled="False"
+            <TextBox IsReadOnly="True"
                      Style="{StaticResource ObfuscationTextBoxTheme}"
-                     Text="{Binding Code.Obfuscated, UpdateSourceTrigger=PropertyChanged}" />
-        </StackPanel>
+                     Text="{Binding Code.Obfuscated, UpdateSourceTrigger=PropertyChanged}"
+                     DockPanel.Dock="Top"/>
+        </DockPanel>
     </Grid>
 </UserControl>
