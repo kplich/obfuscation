@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using Obfuscation.Annotations;
 
-namespace Obfuscation.Controls.Obfuscation
+namespace Obfuscation.Controls.Obfuscation.Model
 {
     public sealed class ObfuscatedCode : INotifyPropertyChanged
     {

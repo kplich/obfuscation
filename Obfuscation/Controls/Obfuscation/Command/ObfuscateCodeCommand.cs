@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Threading.Tasks;
 using System.Windows.Input;
+using Obfuscation.Core;
 
-namespace Obfuscation.Controls.Obfuscation
+namespace Obfuscation.Controls.Obfuscation.Command
 {
     internal class ObfuscateCodeCommand : ICommand
     {
@@ -23,12 +23,29 @@ namespace Obfuscation.Controls.Obfuscation
         
         public bool CanExecute(object parameter)
         {
-            return _viewModel.CodeCanBeObfuscated;
+            return !string.IsNullOrWhiteSpace(_viewModel.Code.Original);
         }
 
         public async void Execute(object parameter)
         {
-            await _viewModel.PerformCodeObfuscation();
+            var obfuscatedCode = _viewModel.Code.Original;
+            
+            if (_viewModel.Options.RenameClasses)
+            {
+                obfuscatedCode = await obfuscatedCode.RewriteCodeAsync<RandomClassRenamer>();
+            }
+
+            if (_viewModel.Options.RenameMethods)
+            {
+                obfuscatedCode = await obfuscatedCode.RewriteCodeAsync<RandomMethodRenamer>();
+            }
+
+            if (_viewModel.Options.RenameVariables)
+            {
+                obfuscatedCode = await obfuscatedCode.RewriteCodeAsync<RandomVariableRenamer>();
+            }
+
+            _viewModel.Code.Obfuscated = obfuscatedCode;
         }
 
         #endregion

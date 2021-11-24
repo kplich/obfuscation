@@ -1,8 +1,6 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
-using Microsoft.Win32;
+﻿using System.Windows.Input;
+using Obfuscation.Controls.Obfuscation.Command;
+using Obfuscation.Controls.Obfuscation.Model;
 using Obfuscation.Core;
 
 namespace Obfuscation.Controls.Obfuscation
@@ -11,6 +9,11 @@ namespace Obfuscation.Controls.Obfuscation
     {
         public ObfuscatedCode Code { get; }
         public ObfuscationOptions Options { get; }
+        
+        public ICommand ObfuscateCode { get; }
+        public ICommand SaveObfuscatedCode { get; }
+        public ICommand LoadCode { get; }
+        public ICommand RunCode { get; }
 
         public ObfuscationViewModel() : base("Obfuscation")
         {
@@ -20,60 +23,7 @@ namespace Obfuscation.Controls.Obfuscation
             ObfuscateCode = new ObfuscateCodeCommand(this);
             LoadCode = new LoadCodeCommand(this);
             SaveObfuscatedCode = new SaveObfuscatedCodeCommand(this);
+            RunCode = new RunCodeCommand(this);
         }
-
-        #region 'Load code' button
-        public ICommand LoadCode { get; }
-        public void LoadCodeFromFile()
-        {
-            var openFileDialog = new OpenFileDialog();
-            if (openFileDialog.ShowDialog() == true)
-            {
-                Code.Original = File.ReadAllText(openFileDialog.FileName);
-            }
-        }
-
-        #endregion
-
-        #region 'Obfuscate code' button
-
-        public ICommand ObfuscateCode { get; }
-        public bool CodeCanBeObfuscated => !string.IsNullOrWhiteSpace(Code.Original);
-
-        public async Task PerformCodeObfuscation()
-        {
-            var obfuscatedCode = Code.Original;
-            
-            if (Options.RenameClasses)
-            {
-                obfuscatedCode = await obfuscatedCode.RewriteCodeAsync<RandomClassRenamer>();
-            }
-
-            if (Options.RenameMethods)
-            {
-                obfuscatedCode = await obfuscatedCode.RewriteCodeAsync<RandomMethodRenamer>();
-            }
-
-            if (Options.RenameVariables)
-            {
-                obfuscatedCode = await obfuscatedCode.RewriteCodeAsync<RandomVariableRenamer>();
-            }
-
-            Code.Obfuscated = obfuscatedCode;
-        }
-
-        #endregion
-
-        #region 'Save obfuscated code' button
-
-        public ICommand SaveObfuscatedCode { get; }
-        public bool ObfuscatedCodeCanBeSaved => !string.IsNullOrWhiteSpace(Code.Obfuscated);
-
-        public void SaveObfuscatedCodeToFile()
-        {
-            MessageBox.Show(Code.Obfuscated, "Saved obfuscated code!");
-        }
-
-        #endregion
     }
 }

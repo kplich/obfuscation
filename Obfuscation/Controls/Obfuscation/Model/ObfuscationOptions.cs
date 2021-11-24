@@ -1,9 +1,9 @@
-﻿namespace Obfuscation.Controls.Obfuscation
+﻿namespace Obfuscation.Controls.Obfuscation.Model
 {
     public class ObfuscationOptions
     {
-        public bool RenameClasses { get; set; } = false;
-        public bool RenameMethods { get; set; } = false;
-        public bool RenameVariables { get; set; } = false;
+        public bool RenameClasses { get; set; }
+        public bool RenameMethods { get; set; }
+        public bool RenameVariables { get; set; }
     }
 }

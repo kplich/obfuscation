@@ -1,7 +1,9 @@
 ﻿using System;
+using System.IO;
 using System.Windows.Input;
+using Microsoft.Win32;
 
-namespace Obfuscation.Controls.Obfuscation
+namespace Obfuscation.Controls.Obfuscation.Command
 {
     internal class LoadCodeCommand : ICommand
     {
@@ -27,7 +29,11 @@ namespace Obfuscation.Controls.Obfuscation
 
         public void Execute(object parameter)
         {
-            _viewModel.LoadCodeFromFile();
+            var openFileDialog = new OpenFileDialog();
+            if (openFileDialog.ShowDialog() == true)
+            {
+                _viewModel.Code.Original = File.ReadAllText(openFileDialog.FileName);
+            }
         }
 
         #endregion

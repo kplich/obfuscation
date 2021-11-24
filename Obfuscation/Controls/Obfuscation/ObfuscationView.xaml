@@ -50,6 +50,7 @@
                     <ColumnDefinition />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
                 <Label Grid.Column="0" Style="{StaticResource ObfuscationHeaderLabelTheme}">
@@ -64,6 +65,11 @@
                         Style="{StaticResource ObfuscationHeaderButtonTheme}"
                         Command="{Binding ObfuscateCode}">
                     Obfuscate code
+                </Button>
+                <Button Grid.Column="3"
+                        Style="{StaticResource ObfuscationHeaderButtonTheme}"
+                        Command="{Binding RunCode}">
+                    Run code
                 </Button>
             </Grid>
             <TextBox Style="{StaticResource ObfuscationTextBoxTheme}"

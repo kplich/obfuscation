@@ -1,8 +1,6 @@
-﻿using System.Windows.Controls;
-
-namespace Obfuscation.Controls.Obfuscation
+﻿namespace Obfuscation.Controls.Obfuscation
 {
-    public partial class ObfuscationView : UserControl
+    public partial class ObfuscationView
     {
         public ObfuscationView()
         {
