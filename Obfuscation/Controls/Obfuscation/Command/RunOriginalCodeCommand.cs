@@ -4,11 +4,11 @@ using Obfuscation.Core;
 
 namespace Obfuscation.Controls.Obfuscation.Command
 {
-    internal class RunCodeCommand : ICommand
+    internal class RunOriginalCodeCommand : ICommand
     {
         private readonly ObfuscationViewModel _viewModel;
 
-        public RunCodeCommand(ObfuscationViewModel viewModel)
+        public RunOriginalCodeCommand(ObfuscationViewModel viewModel)
         {
             _viewModel = viewModel;
         }

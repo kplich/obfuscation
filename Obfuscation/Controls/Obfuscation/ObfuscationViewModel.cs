@@ -13,7 +13,8 @@ namespace Obfuscation.Controls.Obfuscation
         public ICommand ObfuscateCode { get; }
         public ICommand SaveObfuscatedCode { get; }
         public ICommand LoadCode { get; }
-        public ICommand RunCode { get; }
+        public ICommand RunOriginalCode { get; }
+        public ICommand RunObfuscatedCode { get; }
 
         public ObfuscationViewModel() : base("Obfuscation")
         {
@@ -23,7 +24,8 @@ namespace Obfuscation.Controls.Obfuscation
             ObfuscateCode = new ObfuscateCodeCommand(this);
             LoadCode = new LoadCodeCommand(this);
             SaveObfuscatedCode = new SaveObfuscatedCodeCommand(this);
-            RunCode = new RunCodeCommand(this);
+            RunOriginalCode = new RunOriginalCodeCommand(this);
+            RunObfuscatedCode = new RunObfuscatedCodeCommand(this);
         }
     }
 }

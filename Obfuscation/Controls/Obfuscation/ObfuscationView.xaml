@@ -59,17 +59,17 @@
                 <Button Grid.Column="1" 
                         Style="{StaticResource ObfuscationHeaderButtonTheme}"
                         Command="{Binding LoadCode}">
-                    Load code
+                    Load
                 </Button>
                 <Button Grid.Column="2"
                         Style="{StaticResource ObfuscationHeaderButtonTheme}"
                         Command="{Binding ObfuscateCode}">
-                    Obfuscate code
+                    Obfuscate
                 </Button>
                 <Button Grid.Column="3"
                         Style="{StaticResource ObfuscationHeaderButtonTheme}"
-                        Command="{Binding RunCode}">
-                    Run code
+                        Command="{Binding RunOriginalCode}">
+                    Run
                 </Button>
             </Grid>
             <TextBox Style="{StaticResource ObfuscationTextBoxTheme}"
@@ -82,6 +82,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
                 <Label Grid.Column="0" Style="{StaticResource ObfuscationHeaderLabelTheme}">
@@ -90,7 +91,12 @@
                 <Button Grid.Column="1"
                         Style="{StaticResource ObfuscationHeaderButtonTheme}"
                         Command="{Binding SaveObfuscatedCode}">
-                    Save obfuscated code
+                    Save
+                </Button>
+                <Button Grid.Column="2"
+                        Style="{StaticResource ObfuscationHeaderButtonTheme}"
+                        Command="{Binding RunObfuscatedCode}">
+                    Run
                 </Button>
             </Grid>
             <TextBox IsReadOnly="True"

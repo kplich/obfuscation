@@ -1,65 +1,49 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Emit;
 
 namespace Obfuscation.Core
 {
-    public class CodeRunner
+    public static class CodeRunner
     {
-        public static void RunCode(string code)
+        public static async void RunCode(string code)
         {
-            SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(code);
-
-            string assemblyName = Path.GetRandomFileName();
-            var references = new List<MetadataReference> {
-                MetadataReference.CreateFromFile(typeof(Console).Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(decimal).Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location)
-            };
+            var projectDirectory = GetTemporaryDirectory();
             
-            Assembly.GetEntryAssembly().GetReferencedAssemblies()
-                .ToList()
-                .ForEach(assembly => references.Add(MetadataReference.CreateFromFile(Assembly.Load(assembly).Location)));
+            using var createNewProjectProcess = new Process();
+            createNewProjectProcess.StartInfo.WorkingDirectory = projectDirectory;
+            createNewProjectProcess.StartInfo.FileName = "dotnet";
+            createNewProjectProcess.StartInfo.Arguments = "new console";
+            createNewProjectProcess.StartInfo.CreateNoWindow = true;
+            createNewProjectProcess.StartInfo.UseShellExecute = false;
+            createNewProjectProcess.Start();
+            await createNewProjectProcess.WaitForExitAsync();
 
-            CSharpCompilation compilation = CSharpCompilation.Create(
-                assemblyName,
-                new[] { syntaxTree },
-                references,
-                new CSharpCompilationOptions(OutputKind.ConsoleApplication));
+            await File.WriteAllTextAsync(Path.Combine(projectDirectory, "Program.cs"), code);
 
-            using (var ms = new MemoryStream())
-            {
-                EmitResult result = compilation.Emit(ms);
-
-                if (!result.Success)
-                {
-                    IEnumerable<Diagnostic> failures = result.Diagnostics.Where(diagnostic => 
-                        diagnostic.IsWarningAsError || 
-                        diagnostic.Severity == DiagnosticSeverity.Error);
-
-                    foreach (Diagnostic diagnostic in failures)
-                    {
-                        Console.Error.WriteLine("{0}: {1}", diagnostic.Id, diagnostic.GetMessage());
-                    }
-                }
-                else
-                {
-                    ms.Seek(0, SeekOrigin.Begin);
-                    Assembly assembly = Assembly.Load(ms.ToArray());
-
-                    Type type = assembly.GetType("TopLevel.Child1.Foo");
-                    type.GetRuntimeMethods().Single(info => info.Name == "Main").Invoke(null, null);
-                }
-            }
-
-            Console.ReadLine();
+            using var buildProjectProcess = new Process();
+            buildProjectProcess.StartInfo.WorkingDirectory = projectDirectory;
+            buildProjectProcess.StartInfo.FileName = "dotnet";
+            buildProjectProcess.StartInfo.Arguments = "build";
+            buildProjectProcess.StartInfo.CreateNoWindow = true;
+            buildProjectProcess.StartInfo.UseShellExecute = false;
+            buildProjectProcess.Start();
+            await buildProjectProcess.WaitForExitAsync();
+            
+            using var runProjectProcess = new Process();
+            runProjectProcess.StartInfo.WorkingDirectory = projectDirectory;
+            runProjectProcess.StartInfo.FileName = "dotnet";
+            runProjectProcess.StartInfo.Arguments = "run";
+            runProjectProcess.StartInfo.CreateNoWindow = false;
+            runProjectProcess.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+            runProjectProcess.Start();
+        }
+        
+        private static string GetTemporaryDirectory()
+        {
+            var tempDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Directory.CreateDirectory(tempDirectory);
+            return tempDirectory;
         }
         
     }
