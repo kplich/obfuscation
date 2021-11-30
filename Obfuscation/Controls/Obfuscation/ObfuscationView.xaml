@@ -83,6 +83,7 @@
                     <ColumnDefinition />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
                 <Label Grid.Column="0" Style="{StaticResource ObfuscationHeaderLabelTheme}">
@@ -97,6 +98,11 @@
                         Style="{StaticResource ObfuscationHeaderButtonTheme}"
                         Command="{Binding RunObfuscatedCode}">
                     Run
+                </Button>
+                <Button Grid.Column="3"
+                        Style="{StaticResource ObfuscationHeaderButtonTheme}"
+                        Command="{Binding SetObfuscatedAsOriginal}">
+                    Set as original
                 </Button>
             </Grid>
             <TextBox IsReadOnly="True"

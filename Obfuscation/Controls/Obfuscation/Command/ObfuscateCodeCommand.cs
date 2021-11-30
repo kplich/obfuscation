@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Windows.Input;
+using Microsoft.CodeAnalysis.CSharp;
 using Obfuscation.Core;
+using Obfuscation.Core.Bloat;
 
 namespace Obfuscation.Controls.Obfuscation.Command
 {
@@ -44,6 +46,11 @@ namespace Obfuscation.Controls.Obfuscation.Command
             {
                 obfuscatedCode = await obfuscatedCode.RewriteCodeAsync<RandomVariableRenamer>();
             }
+
+            // bloat the obfuscated code with extra classes
+            var syntaxTree = CSharpSyntaxTree.ParseText(obfuscatedCode);
+            var newRoot = new ClassBloater().Visit(await syntaxTree.GetRootAsync());
+            obfuscatedCode = newRoot.ToFullString();
 
             _viewModel.Code.Obfuscated = obfuscatedCode;
         }
