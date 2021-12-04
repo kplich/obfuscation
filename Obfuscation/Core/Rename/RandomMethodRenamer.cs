@@ -1,15 +1,21 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Rename;
+using Obfuscation.Core.Name;
 
-namespace Obfuscation.Core
+namespace Obfuscation.Core.Rename
 {
     public class RandomMethodRenamer : CodeRenamer
     {
-        public override async Task<Solution> RewriteCode(Solution solution, SyntaxTree syntaxTree, SemanticModel semanticModel)
+        public RandomMethodRenamer(IImmutableList<IIdentifierGenerator> generators) : base(generators)
+        {
+        }
+
+        protected override async Task<Solution> RewriteCode(Solution solution, SyntaxTree syntaxTree, SemanticModel semanticModel)
         {
             var methodDeclarations = (await syntaxTree.GetRootAsync()).DescendantNodes().OfType<MethodDeclarationSyntax>();
             var methodSymbols
@@ -23,7 +29,7 @@ namespace Obfuscation.Core
                 if (methodSymbol.IsNotMain())
                 {
                     solution = await Renamer.RenameSymbolAsync(solution, methodSymbol,
-                        Guid.NewGuid().ToString().Replace("-", "").Insert(0, "_"), solution.Workspace.Options);
+                        ChooseGenerator().GenerateMethodName(), solution.Workspace.Options);
                 }
             }
 

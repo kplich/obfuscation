@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Windows.Input;
 using Microsoft.CodeAnalysis.CSharp;
-using Obfuscation.Core;
 using Obfuscation.Core.Bloat;
+using Obfuscation.Core.Rename;
 
 namespace Obfuscation.Controls.Obfuscation.Command
 {
@@ -31,20 +31,24 @@ namespace Obfuscation.Controls.Obfuscation.Command
         public async void Execute(object parameter)
         {
             var obfuscatedCode = _viewModel.Code.Original;
+            var identifierGenerators = _viewModel.Options.ChosenIdentifierGenerationStrategies;
             
             if (_viewModel.Options.RenameClasses)
             {
-                obfuscatedCode = await obfuscatedCode.RewriteCodeAsync<RandomClassRenamer>();
+                var renamer = new RandomClassRenamer(identifierGenerators);
+                obfuscatedCode = await obfuscatedCode.RewriteCodeAsync(renamer);
             }
 
             if (_viewModel.Options.RenameMethods)
             {
-                obfuscatedCode = await obfuscatedCode.RewriteCodeAsync<RandomMethodRenamer>();
+                var renamer = new RandomMethodRenamer(identifierGenerators);
+                obfuscatedCode = await obfuscatedCode.RewriteCodeAsync(renamer);
             }
 
             if (_viewModel.Options.RenameVariables)
             {
-                obfuscatedCode = await obfuscatedCode.RewriteCodeAsync<RandomVariableRenamer>();
+                var renamer = new RandomVariableRenamer(identifierGenerators);
+                obfuscatedCode = await obfuscatedCode.RewriteCodeAsync(renamer);
             }
 
             // bloat the obfuscated code with extra classes

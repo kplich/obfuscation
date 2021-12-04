@@ -1,15 +1,21 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Rename;
+using Obfuscation.Core.Name;
 
-namespace Obfuscation.Core
+namespace Obfuscation.Core.Rename
 {
     public class RandomVariableRenamer : CodeRenamer
     {
-        public override async Task<Solution> RewriteCode(Solution solution, SyntaxTree syntaxTree, SemanticModel semanticModel)
+        public RandomVariableRenamer(IImmutableList<IIdentifierGenerator> generators) : base(generators)
+        {
+        }
+
+        protected override async Task<Solution> RewriteCode(Solution solution, SyntaxTree syntaxTree, SemanticModel semanticModel)
         {
             var variableDeclarations = (await syntaxTree.GetRootAsync()).DescendantNodes().OfType<VariableDeclaratorSyntax>();
             var variableSymbols
@@ -20,7 +26,7 @@ namespace Obfuscation.Core
             foreach (var variableSymbol in variableSymbols)
             {
                 solution = await Renamer.RenameSymbolAsync(solution, variableSymbol,
-                    Guid.NewGuid().ToString().Replace("-", "").Insert(0, "_"), solution.Workspace.Options);
+                    ChooseGenerator().GenerateVariableName(), solution.Workspace.Options);
             }
 
             return solution;

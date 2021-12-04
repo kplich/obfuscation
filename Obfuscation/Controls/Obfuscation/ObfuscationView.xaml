@@ -27,7 +27,7 @@
                        TextWrapping="Wrap">
                 Obfuscation options
             </TextBlock>
-            <Expander Header="Renaming" Margin="5">
+            <Expander Header="Renaming targets" Margin="5">
                 <StackPanel Margin="5">
                     <CheckBox IsChecked="{Binding Options.RenameClasses}" Margin="5">
                         Rename classes
@@ -39,6 +39,20 @@
                         Rename variables
                     </CheckBox>
                 </StackPanel>
+            </Expander>
+            <Separator Margin="5" />
+            <Expander Header="Name generation" Margin="5">
+                <ListBox Margin="5"
+                         ItemsSource="{Binding Options.IdentifierGenerationStrategies, Mode=OneWay}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding Value, Mode=TwoWay}"
+                                      Content="{Binding Key.DisplayName, Mode=OneWay}"
+                                      Margin="5">
+                            </CheckBox>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
             </Expander>
             <Separator Margin="5" />
         </StackPanel>

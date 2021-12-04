@@ -2,8 +2,10 @@
 
 namespace Obfuscation.Core.Name
 {
-    public class GuidNameGenerator: INameGenerator
+    public class GuidIdentifierGenerator: IIdentifierGenerator
     {
+        public string DisplayName => "GUID";
+
         public string GenerateName()
         {
             var guid = Guid.NewGuid().ToString().Replace("-", "");

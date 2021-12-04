@@ -20,7 +20,7 @@ namespace Obfuscation.Core.Bloat
 
             }.Select(typeString => ParseTypeName(typeString)).ToList();
 
-        private readonly INameGenerator _nameGenerator = new GuidNameGenerator();
+        private readonly IIdentifierGenerator _identifierGenerator = new GuidIdentifierGenerator();
 
         public override SyntaxNode VisitNamespaceDeclaration(NamespaceDeclarationSyntax node)
         {
@@ -29,7 +29,7 @@ namespace Obfuscation.Core.Bloat
 
         private ClassDeclarationSyntax GenerateClass()
         {
-            var randomName = _nameGenerator.GenerateName();
+            var randomName = _identifierGenerator.GenerateName();
             var trailingWhitespaces = BloaterUtils.EndOfLineTrivia();
 
             var identifierToken = Identifier(SyntaxTriviaList.Empty, randomName, trailingWhitespaces);
@@ -57,7 +57,7 @@ namespace Obfuscation.Core.Bloat
             var type = PrimitiveTypes.GetRandomElement()
                 .WithTrailingTrivia(BloaterUtils.SpaceTrivia());
             
-            var randomName = _nameGenerator.GenerateName();
+            var randomName = _identifierGenerator.GenerateName();
             var trailingWhitespaces = BloaterUtils.SpaceTrivia();
 
             var identifierToken = Identifier(SyntaxTriviaList.Empty, randomName, trailingWhitespaces);
