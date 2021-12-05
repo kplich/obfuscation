@@ -29,7 +29,7 @@ namespace Obfuscation.Core.Rename
                 if (methodSymbol.IsNotMain())
                 {
                     solution = await Renamer.RenameSymbolAsync(solution, methodSymbol,
-                        ChooseGenerator().GenerateMethodName(), solution.Workspace.Options);
+                        ChooseGenerator().GenerateMethodName(methodSymbol.Name), solution.Workspace.Options);
                 }
             }
 
@@ -43,8 +43,7 @@ namespace Obfuscation.Core.Rename
             methodSymbol.IsStatic &&
             methodSymbol.Name == "Main" &&
             methodSymbol.ReturnsVoid &&
-            methodSymbol.Arity == 0 &&
-            methodSymbol.DeclaredAccessibility == Microsoft.CodeAnalysis.Accessibility.Private;
+            methodSymbol.Arity == 0;
 
         internal static bool IsNotMain(this IMethodSymbol methodSymbol) => !methodSymbol.IsMain();
     }

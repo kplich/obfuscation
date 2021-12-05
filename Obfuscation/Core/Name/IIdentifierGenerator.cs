@@ -21,26 +21,28 @@ namespace Obfuscation.Core.Name
 
         public string DisplayName { get; }
 
-        public string GenerateName();
+        public void ClearCache();
 
-        public string GenerateNamespaceName()
+        public string GenerateName(string originalName);
+
+        public string GenerateClassName(string originalName)
         {
-            return GenerateName();
+            return GenerateName(originalName);
         }
 
-        public string GenerateVariableName()
+        public string GenerateVariableName(string originalName)
         {
-            return GenerateName();
+            return GenerateName(originalName);
         }
 
-        public string GeneratePropertyName()
+        public string GeneratePropertyName(string originalName)
         {
-            return GenerateName();
+            return GenerateName(originalName);
         }
 
-        public string GenerateMethodName()
+        public string GenerateMethodName(string originalName)
         {
-            return GenerateName();
+            return GenerateName(originalName);
         }
     }
 }

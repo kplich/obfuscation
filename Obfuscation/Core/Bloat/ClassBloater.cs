@@ -29,7 +29,7 @@ namespace Obfuscation.Core.Bloat
 
         private ClassDeclarationSyntax GenerateClass()
         {
-            var randomName = _identifierGenerator.GenerateName();
+            var randomName = _identifierGenerator.GenerateName(string.Empty);
             var trailingWhitespaces = BloaterUtils.EndOfLineTrivia();
 
             var identifierToken = Identifier(SyntaxTriviaList.Empty, randomName, trailingWhitespaces);
@@ -57,7 +57,7 @@ namespace Obfuscation.Core.Bloat
             var type = PrimitiveTypes.GetRandomElement()
                 .WithTrailingTrivia(BloaterUtils.SpaceTrivia());
             
-            var randomName = _identifierGenerator.GenerateName();
+            var randomName = _identifierGenerator.GenerateName(string.Empty);
             var trailingWhitespaces = BloaterUtils.SpaceTrivia();
 
             var identifierToken = Identifier(SyntaxTriviaList.Empty, randomName, trailingWhitespaces);

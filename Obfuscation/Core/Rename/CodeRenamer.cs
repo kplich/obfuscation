@@ -49,6 +49,10 @@ namespace Obfuscation.Core.Rename
 
             if (IdentifierGeneratorsAreProvided)
             {
+                foreach (var generator in _identifierGenerators)
+                {
+                    generator.ClearCache();
+                }
                 solution = await RewriteCode(solution, syntaxTree, semanticModel).ConfigureAwait(false);
             }
             else
@@ -58,6 +62,7 @@ namespace Obfuscation.Core.Rename
 
             return (await solution.Projects.Single().Documents.Single().GetSyntaxRootAsync())?.ToFullString();
         }
+
 
         protected IIdentifierGenerator ChooseGenerator()
         {
