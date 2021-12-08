@@ -29,7 +29,7 @@ namespace Obfuscation.Core.Rename
                 if (methodSymbol.IsNotMain())
                 {
                     solution = await Renamer.RenameSymbolAsync(solution, methodSymbol,
-                        ChooseGenerator().GenerateMethodName(methodSymbol.Name), solution.Workspace.Options);
+                        ChooseGenerator().TransformMethodName(methodSymbol.Name), solution.Workspace.Options);
                 }
             }
 

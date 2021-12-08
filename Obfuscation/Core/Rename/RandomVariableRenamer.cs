@@ -26,7 +26,7 @@ namespace Obfuscation.Core.Rename
             foreach (var variableSymbol in variableSymbols)
             {
                 solution = await Renamer.RenameSymbolAsync(solution, variableSymbol,
-                    ChooseGenerator().GenerateVariableName(variableSymbol.Name), solution.Workspace.Options);
+                    ChooseGenerator().TransformVariableName(variableSymbol.Name), solution.Workspace.Options);
             }
 
             return solution;

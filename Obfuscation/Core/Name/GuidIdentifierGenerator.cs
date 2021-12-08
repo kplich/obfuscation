@@ -9,7 +9,7 @@ namespace Obfuscation.Core.Name
         public void ClearCache()
         { }
 
-        public string GenerateName(string originalName)
+        public string TransformName(string originalName)
         {
             var guid = Guid.NewGuid().ToString().Replace("-", "");
             var firstChar = guid[0];

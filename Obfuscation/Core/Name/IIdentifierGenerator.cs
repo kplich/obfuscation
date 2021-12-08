@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
@@ -23,26 +22,26 @@ namespace Obfuscation.Core.Name
 
         public void ClearCache();
 
-        public string GenerateName(string originalName);
+        public string TransformName(string originalName);
 
-        public string GenerateClassName(string originalName)
+        public string TransformClassName(string originalName)
         {
-            return GenerateName(originalName);
+            return TransformName(originalName);
         }
 
-        public string GenerateVariableName(string originalName)
+        public string TransformVariableName(string originalName)
         {
-            return GenerateName(originalName);
+            return TransformName(originalName);
         }
 
-        public string GeneratePropertyName(string originalName)
+        public string TransformPropertyName(string originalName)
         {
-            return GenerateName(originalName);
+            return TransformName(originalName);
         }
 
-        public string GenerateMethodName(string originalName)
+        public string TransformMethodName(string originalName)
         {
-            return GenerateName(originalName);
+            return TransformName(originalName);
         }
     }
 }

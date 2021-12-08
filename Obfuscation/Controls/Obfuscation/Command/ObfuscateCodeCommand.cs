@@ -52,9 +52,13 @@ namespace Obfuscation.Controls.Obfuscation.Command
             }
 
             // bloat the obfuscated code with extra classes
-            var syntaxTree = CSharpSyntaxTree.ParseText(obfuscatedCode);
+            /*var syntaxTree = CSharpSyntaxTree.ParseText(obfuscatedCode);
             var newRoot = new ClassBloater().Visit(await syntaxTree.GetRootAsync());
-            obfuscatedCode = newRoot.ToFullString();
+            obfuscatedCode = newRoot.ToFullString();*/
+
+            var syntaxTree2 = CSharpSyntaxTree.ParseText(obfuscatedCode);
+            var newRoot2 = new NumericLiteralReplacer(identifierGenerators).Visit(await syntaxTree2.GetRootAsync());
+            obfuscatedCode = newRoot2.ToFullString();
 
             _viewModel.Code.Obfuscated = obfuscatedCode;
         }

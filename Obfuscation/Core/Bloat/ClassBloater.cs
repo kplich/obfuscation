@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Obfuscation.Core.Name;
+using Obfuscation.Utils;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using static Obfuscation.Core.Bloat.SyntaxTriviaUtils;
 
 namespace Obfuscation.Core.Bloat
 {
@@ -29,95 +29,54 @@ namespace Obfuscation.Core.Bloat
 
         private ClassDeclarationSyntax GenerateClass()
         {
-            var randomName = _identifierGenerator.GenerateName(string.Empty);
-            var trailingWhitespaces = BloaterUtils.EndOfLineTrivia();
+            var randomName = _identifierGenerator.TransformName(string.Empty);
+            var trailingWhitespaces = EndOfLineTrivia();
 
             var identifierToken = Identifier(SyntaxTriviaList.Empty, randomName, trailingWhitespaces);
 
             return ClassDeclaration(identifierToken)
-                .WithTrailingTrivia(BloaterUtils.EndOfLineTrivia())
+                .WithTrailingTrivia(EndOfLineTrivia())
                 .WithKeyword(Token(SyntaxKind.ClassKeyword)
-                    .WithLeadingTrivia(BloaterUtils.TabulatorTrivia(1))
-                    .WithTrailingTrivia(BloaterUtils.SpaceTrivia()))
+                    .WithLeadingTrivia(TabulatorTrivia(1))
+                    .WithTrailingTrivia(SpaceTrivia()))
                 .WithOpenBraceToken(
                     Token(SyntaxKind.OpenBraceToken)
-                        .WithLeadingTrivia(BloaterUtils.TabulatorTrivia(1))
-                        .WithTrailingTrivia(BloaterUtils.EndOfLineTrivia()))
+                        .WithLeadingTrivia(TabulatorTrivia(1))
+                        .WithTrailingTrivia(EndOfLineTrivia()))
                 .WithCloseBraceToken(
                     Token(SyntaxKind.CloseBraceToken)
-                        .WithLeadingTrivia(BloaterUtils.TabulatorTrivia(1))
-                        .WithTrailingTrivia(BloaterUtils.EndOfLineTrivia())
+                        .WithLeadingTrivia(TabulatorTrivia(1))
+                        .WithTrailingTrivia(EndOfLineTrivia())
                 )
-                .WithTrailingTrivia(BloaterUtils.EndOfLineTrivia())
+                .WithTrailingTrivia(EndOfLineTrivia())
                 .AddMembers(GeneratePrimitiveProperty());
         }
 
         private MemberDeclarationSyntax GeneratePrimitiveProperty()
         {
             var type = PrimitiveTypes.GetRandomElement()
-                .WithTrailingTrivia(BloaterUtils.SpaceTrivia());
+                .WithTrailingTrivia(SpaceTrivia());
             
-            var randomName = _identifierGenerator.GenerateName(string.Empty);
-            var trailingWhitespaces = BloaterUtils.SpaceTrivia();
+            var randomName = _identifierGenerator.TransformName(string.Empty);
+            var trailingWhitespaces = SpaceTrivia();
 
             var identifierToken = Identifier(SyntaxTriviaList.Empty, randomName, trailingWhitespaces);
 
             return PropertyDeclaration(type, identifierToken)
                 .AddModifiers(
                     Token(SyntaxKind.PublicKeyword)
-                        .WithLeadingTrivia(BloaterUtils.TabulatorTrivia(2))
-                        .WithTrailingTrivia(BloaterUtils.SpaceTrivia()))
+                        .WithLeadingTrivia(TabulatorTrivia(2))
+                        .WithTrailingTrivia(SpaceTrivia()))
                 .AddAccessorListAccessors(
                     AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
-                        .WithLeadingTrivia(BloaterUtils.SpaceTrivia())
+                        .WithLeadingTrivia(SpaceTrivia())
                         .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
-                        .WithTrailingTrivia(BloaterUtils.SpaceTrivia()))
+                        .WithTrailingTrivia(SpaceTrivia()))
                 .AddAccessorListAccessors(
                     AccessorDeclaration(SyntaxKind.SetAccessorDeclaration)
                         .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
-                        .WithTrailingTrivia(BloaterUtils.SpaceTrivia()))
-                .WithTrailingTrivia(BloaterUtils.EndOfLineTrivia());
-        }
-    }
-
-    internal static class ListUtil
-    {
-        public static T GetRandomElement<T>(this List<T> list)
-        {
-            return list[new Random().Next(list.Count)];
-        }
-    }
-
-    internal static class BloaterUtils
-    {
-        public static SyntaxTriviaList SpaceTrivia()
-        {
-            return new SyntaxTriviaList(SyntaxTrivia(SyntaxKind.WhitespaceTrivia, " "));
-        }
-        
-        public static SyntaxTriviaList TabulatorTrivia(int numberOfTabs, int spacesInTab = 4)
-        {
-            var whitespaceString = " ".Repeat(numberOfTabs * spacesInTab);
-            return new SyntaxTriviaList(SyntaxTrivia(SyntaxKind.WhitespaceTrivia, whitespaceString));
-        }
-
-        public static SyntaxTriviaList EndOfLineTrivia()
-        {
-            return new SyntaxTriviaList(SyntaxTrivia(SyntaxKind.EndOfLineTrivia, "\n"));
-        }
-    }
-
-    internal static class StringUtils
-    {
-        public static string Repeat(this string s, int numberOfTimes)
-        {
-            var builder = new StringBuilder();
-            for (var i = 0; i < numberOfTimes; i++)
-            {
-                builder.Append(s);
-            }
-
-            return builder.ToString();
+                        .WithTrailingTrivia(SpaceTrivia()))
+                .WithTrailingTrivia(EndOfLineTrivia());
         }
     }
 }
