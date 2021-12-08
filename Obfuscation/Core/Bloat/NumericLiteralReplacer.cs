@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Obfuscation.Annotations;
 using Obfuscation.Core.Name;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Obfuscation.Core.Bloat.SyntaxTriviaUtils;
@@ -15,7 +16,7 @@ namespace Obfuscation.Core.Bloat
     {
         private class LiteralExpressionInfo
         {
-            public LiteralExpressionSyntax Value { get; set; }
+            public LiteralExpressionSyntax Literal { get; set; }
             public string NewName { get; set; }
             public MemberDeclarationSyntax Member { get; set; }
         }
@@ -38,7 +39,7 @@ namespace Obfuscation.Core.Bloat
                 var newPropertyName = ChooseGenerator().TransformName(string.Empty);
                 _untransformedLiterals.Add(new LiteralExpressionInfo
                 {
-                    Value = literalExpressionSyntax,
+                    Literal = literalExpressionSyntax,
                     NewName = newPropertyName,
                     Member = literalExpressionSyntax.AsPlainProperty(newPropertyName)
                 });
@@ -49,11 +50,21 @@ namespace Obfuscation.Core.Bloat
 
         public override SyntaxNode VisitLiteralExpression(LiteralExpressionSyntax node)
         {
-            var literalInfo = _untransformedLiterals.FirstOrDefault(literalInfo => literalInfo.Value.Token.Text.Equals(node.Token.Text));
+            var literalInfo = _untransformedLiterals.FirstOrDefault(literalInfo => literalInfo.Literal.Token.Text.Equals(node.Token.Text));
             if (literalInfo != null)
             {
-                _untransformedLiterals.Remove(literalInfo);
-                return IdentifierName(literalInfo.NewName);
+                var literal = literalInfo.Literal;
+                var literalIsWithinArgument = literal.GetParent<ParameterSyntax>() != null;
+
+                if (!literalIsWithinArgument)
+                {
+                    _untransformedLiterals.Remove(literalInfo);
+                    return IdentifierName(literalInfo.NewName);
+                }
+                else
+                {
+                    return base.VisitLiteralExpression(node);
+                }
             }
             else
             {
@@ -83,7 +94,19 @@ namespace Obfuscation.Core.Bloat
                     Token(SyntaxKind.PublicKeyword)
                         .WithLeadingTrivia(TabulatorTrivia(2))
                         .WithTrailingTrivia(SpaceTrivia()));
-                
+
+                // sometimes, the property needs to be static!
+                var parentMethod = node.GetParentMethod();
+                var parentMethodIsStatic =
+                    parentMethod?.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.StaticKeyword)) ?? false;
+                var fieldDeclaration = node.GetParentClass();
+                var literalBelongsToAClass = fieldDeclaration != null;
+
+                if (parentMethodIsStatic || literalBelongsToAClass)
+                {
+                    modifiers = modifiers.Add(Token(SyntaxKind.StaticKeyword).WithTrailingTrivia(SpaceTrivia()));
+                }
+
                 var nodeText = node.Token.Text;
                 var type = PredefinedType(nodeText.Contains(".")
                     ? Token(SyntaxKind.DoubleKeyword)
@@ -104,6 +127,49 @@ namespace Obfuscation.Core.Bloat
                     .WithLeadingTrivia(DoubleEndOfLineTrivia());
             }
             else return null;
+        }
+
+        [CanBeNull]
+        internal static MethodDeclarationSyntax GetParentMethod(this SyntaxNode node)
+        {
+            var parentNode = node.Parent;
+            while (parentNode is not MethodDeclarationSyntax && parentNode != null)
+            {
+                parentNode = parentNode.Parent;
+            }
+            return parentNode as MethodDeclarationSyntax;
+        }
+        
+        [CanBeNull]
+        internal static ClassDeclarationSyntax GetParentClass(this SyntaxNode node)
+        {
+            var parentNode = node.Parent;
+            while (parentNode is not ClassDeclarationSyntax && parentNode != null)
+            {
+                parentNode = parentNode.Parent;
+            }
+            return parentNode as ClassDeclarationSyntax;
+        }
+
+        internal static ParameterSyntax GetParentParameter(this SyntaxNode node)
+        {
+            var parentNode = node.Parent;
+            while (parentNode is not ParameterSyntax && parentNode != null)
+            {
+                parentNode = parentNode.Parent;
+            }
+            return parentNode as ParameterSyntax;
+        }
+
+        internal static T GetParent<T>(this SyntaxNode node) where T : SyntaxNode
+        {
+            var parentNode = node.Parent;
+            while (parentNode is not T && parentNode != null)
+            {
+                parentNode = parentNode.Parent;
+            }
+
+            return parentNode as T;
         }
     }
 }
