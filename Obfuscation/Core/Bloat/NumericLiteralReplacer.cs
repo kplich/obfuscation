@@ -5,171 +5,203 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Obfuscation.Annotations;
+using Obfuscation.Core.Bloat.Property.Collatz;
 using Obfuscation.Core.Name;
+using Obfuscation.Utils;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Obfuscation.Core.Bloat.SyntaxTriviaUtils;
 
 namespace Obfuscation.Core.Bloat
 {
-    public class NumericLiteralReplacer: CSharpSyntaxRewriter
+    public class NumericLiteralReplacer : CSharpSyntaxRewriter
     {
         private class LiteralExpressionInfo
         {
-            public LiteralExpressionSyntax Literal { get; set; }
-            public string NewName { get; set; }
-            public MemberDeclarationSyntax Member { get; set; }
+            public LiteralExpressionSyntax Literal { get; init; }
+            public string NewName { get; init; }
         }
 
         private readonly IImmutableList<IIdentifierGenerator> _identifierGenerators;
-        private readonly IList<LiteralExpressionInfo> _untransformedLiterals = new List<LiteralExpressionInfo>();
+        private readonly string _doNotObfuscateAttributeName;
+        private readonly string _collatzFunctionName;
+
+        private readonly IDictionary<string, LiteralExpressionInfo> _mapOfLiterals =
+            new Dictionary<string, LiteralExpressionInfo>();
 
         public NumericLiteralReplacer(IImmutableList<IIdentifierGenerator> generators)
         {
             _identifierGenerators = generators;
+            _doNotObfuscateAttributeName = ChooseGenerator().TransformClassName(string.Empty);
+            _collatzFunctionName = ChooseGenerator().TransformMethodName(string.Empty);
         }
 
         public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
         {
+            if (node.ContainsAttributeWithName(_doNotObfuscateAttributeName)) return base.VisitClassDeclaration(node);
+
+            // find collatz function or create it if it doesn't exist
+
+            // if the number is small, obfuscate it as the first smallest/greatest collatz sequence length
+            // if the number is big, obfuscate it as the number with the shortest/longest collatz sequence length
+            // if it's negative, return it as positive and multiplied by -1
+
             var numericLiterals = node.DescendantNodes().OfType<LiteralExpressionSyntax>()
                 .Where(syntaxNode => syntaxNode.Kind() == SyntaxKind.NumericLiteralExpression);
-            
+
             foreach (var literalExpressionSyntax in numericLiterals)
             {
-                var newPropertyName = ChooseGenerator().TransformName(string.Empty);
-                _untransformedLiterals.Add(new LiteralExpressionInfo
+                if (!literalExpressionSyntax.IsWithin<ParameterSyntax>())
                 {
-                    Literal = literalExpressionSyntax,
-                    NewName = newPropertyName,
-                    Member = literalExpressionSyntax.AsPlainProperty(newPropertyName)
-                });
+                    var newPropertyName = ChooseGenerator().TransformName(string.Empty);
+                    _mapOfLiterals[literalExpressionSyntax.Token.Text] = new LiteralExpressionInfo
+                    {
+                        Literal = literalExpressionSyntax,
+                        NewName = newPropertyName
+                    };
+                }
             }
 
-            return base.VisitClassDeclaration(node.AddMembers(_untransformedLiterals.Select(literalInfo => literalInfo.Member).ToArray()));
+            var propertyGenerator = new CollatzPropertyGenerator(_collatzFunctionName, _doNotObfuscateAttributeName);
+
+            var doNotObfuscateAttribute = generateDoNotObfuscateAttribute(_doNotObfuscateAttributeName);
+
+            MemberDeclarationSyntax[] literalsAsProperties =
+                _mapOfLiterals
+                    .Values
+                    .Select(literalInfo =>
+                        propertyGenerator.GenerateProperty(literalInfo.Literal, literalInfo.NewName))
+                    .ToArray() as MemberDeclarationSyntax[];
+            return base.VisitClassDeclaration(
+                node.AddMembers(literalsAsProperties)
+                    .AddMembers(doNotObfuscateAttribute)
+                    .AddMembers(
+                        GenerateCollatzCalculatingFunction(_collatzFunctionName, _doNotObfuscateAttributeName)));
+
         }
 
         public override SyntaxNode VisitLiteralExpression(LiteralExpressionSyntax node)
         {
-            var literalInfo = _untransformedLiterals.FirstOrDefault(literalInfo => literalInfo.Literal.Token.Text.Equals(node.Token.Text));
-            if (literalInfo != null)
-            {
-                var literal = literalInfo.Literal;
-                var literalIsWithinArgument = literal.GetParent<ParameterSyntax>() != null;
-
-                if (!literalIsWithinArgument)
-                {
-                    _untransformedLiterals.Remove(literalInfo);
-                    return IdentifierName(literalInfo.NewName);
-                }
-                else
-                {
-                    return base.VisitLiteralExpression(node);
-                }
-            }
-            else
-            {
+            if (!_mapOfLiterals.ContainsKey(node.Token.Text) || node.HasAParentWithAttributeName(_doNotObfuscateAttributeName))
                 return base.VisitLiteralExpression(node);
-            }
+
+            var literalInfo = _mapOfLiterals[node.Token.Text];
+            return IdentifierName(literalInfo.NewName).WithTrailingTrivia(SpaceTrivia());
+
         }
 
         public IIdentifierGenerator ChooseGenerator()
         {
             return _identifierGenerators[new Random().Next(_identifierGenerators.Count)];
         }
+
+        private MemberDeclarationSyntax generateDoNotObfuscateAttribute(string attributeName)
+        {
+            return ParseMemberDeclaration($"public class {attributeName} : Attribute " + "{}")
+                .WithAttributeLists(new SyntaxList<AttributeListSyntax>(
+                    AttributeList(
+                        new SeparatedSyntaxList<AttributeSyntax>().Add(Attribute(IdentifierName(attributeName)))
+                    ).WithTrailingTrivia(CarriageReturn)
+                ))
+                .WithTrailingTrivia(CarriageReturn, CarriageReturn);
+        }
+
+        private static MethodDeclarationSyntax GenerateCollatzCalculatingFunction(string collatzFunctionName,
+            string doNotObfuscateAttributeName)
+        {
+            // TODO: obfuscate parameter names
+            
+            var attributeLists = new SyntaxList<AttributeListSyntax>(
+                AttributeList(
+                    new SeparatedSyntaxList<AttributeSyntax>().Add(
+                        Attribute(IdentifierName(doNotObfuscateAttributeName)))
+                ).WithTrailingTrivia(CarriageReturn)
+            );
+
+            var modifiers = new SyntaxTokenList(
+                Token(SyntaxKind.PublicKeyword)
+                    .WithLeadingTrivia(TabulatorTrivia(2))
+                    .WithTrailingTrivia(SpaceTrivia()),
+                Token(SyntaxKind.StaticKeyword).WithTrailingTrivia(SpaceTrivia())
+            );
+
+            var returnType = PredefinedType(Token(SyntaxKind.IntKeyword)).WithTrailingTrivia(Space);
+
+            var identifier = Identifier(collatzFunctionName);
+
+            var parameters = new SeparatedSyntaxList<ParameterSyntax>();
+            var parameterList = ParameterList(parameters.Add(Parameter(
+                new SyntaxList<AttributeListSyntax>(),
+                new SyntaxTokenList(),
+                PredefinedType(Token(SyntaxKind.IntKeyword).WithTrailingTrivia(SpaceTrivia())),
+                Identifier("x"),
+                null)));
+
+            var constraintClauses = new SyntaxList<TypeParameterConstraintClauseSyntax>();
+
+            var body = Block(
+                ParseStatement("var length = 0;").WithTrailingTrivia(CarriageReturn, CarriageReturn),
+                ParseStatement("var temp = x;")
+                    .WithTrailingTrivia(CarriageReturn),
+                WhileStatement(ParseExpression("temp > 1"),
+                    Block(
+                        ParseStatement("length++;")
+                            .WithTrailingTrivia(CarriageReturn, CarriageReturn),
+                        IfStatement(ParseExpression("temp % 2 == 0"),
+                            Block(
+                                ParseStatement("temp /= 2;").WithTrailingTrivia(CarriageReturn)
+                            ).WithTrailingTrivia(CarriageReturn),
+                            ElseClause(
+                                Block(
+                                    ParseStatement("temp *= 3;").WithTrailingTrivia(CarriageReturn),
+                                    ParseStatement("temp += 1;").WithTrailingTrivia(CarriageReturn)
+                                )
+                            )
+                        ).WithTrailingTrivia(CarriageReturn)
+                    ).WithTrailingTrivia(CarriageReturn)
+                ).WithTrailingTrivia(CarriageReturn),
+                ReturnStatement(
+                    ParseExpression("length + 1").WithLeadingTrivia(Space)
+                ).WithTrailingTrivia(CarriageReturn)
+            ).WithTrailingTrivia(CarriageReturn);
+
+            var methodDeclaration = MethodDeclaration(
+                attributeLists,
+                modifiers,
+                returnType,
+                null,
+                identifier,
+                null,
+                parameterList,
+                constraintClauses,
+                body,
+                null
+            );
+
+            return methodDeclaration;
+        }
     }
 
     internal static class NumericLiteralReplacerUtils
     {
+        internal static bool ContainsAttributeWithName(this ClassDeclarationSyntax node, string attributeName)
+        {
+            return node.AttributeLists.Any(list =>
+            {
+                return list.Attributes.Any(attribute => attribute.Name.ToString().Contains(attributeName));
+            });
+        }
+
         internal static bool IsOfNumericType(this LiteralExpressionSyntax node)
         {
             return node.Kind() == SyntaxKind.NumericLiteralExpression;
         }
 
-        internal static PropertyDeclarationSyntax AsPlainProperty(this LiteralExpressionSyntax node, string name)
+        internal static bool NeedsToBeStatic(this LiteralExpressionSyntax node)
         {
-            if (node.IsOfNumericType())
-            {
-                var attributeLists = new SyntaxList<AttributeListSyntax>();
-                var modifiers = new SyntaxTokenList(
-                    Token(SyntaxKind.PublicKeyword)
-                        .WithLeadingTrivia(TabulatorTrivia(2))
-                        .WithTrailingTrivia(SpaceTrivia()));
+            var parentMethod = node.GetParent<MethodDeclarationSyntax>();
+            var parentMethodIsStatic = parentMethod?.IsStatic() ?? false;
 
-                // sometimes, the property needs to be static!
-                var parentMethod = node.GetParentMethod();
-                var parentMethodIsStatic =
-                    parentMethod?.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.StaticKeyword)) ?? false;
-                var fieldDeclaration = node.GetParentClass();
-                var literalBelongsToAClass = fieldDeclaration != null;
-
-                if (parentMethodIsStatic || literalBelongsToAClass)
-                {
-                    modifiers = modifiers.Add(Token(SyntaxKind.StaticKeyword).WithTrailingTrivia(SpaceTrivia()));
-                }
-
-                var nodeText = node.Token.Text;
-                var type = PredefinedType(nodeText.Contains(".")
-                    ? Token(SyntaxKind.DoubleKeyword)
-                    : Token(SyntaxKind.IntKeyword)).WithTrailingTrivia(Space);
-
-                var identifierToken = Identifier(SyntaxTriviaList.Empty, name, SpaceTrivia());
-
-                var arrowExpressionClauseSyntax = ArrowExpressionClause(
-                    Token(SyntaxKind.EqualsGreaterThanToken)
-                        .WithTrailingTrivia(Space),
-                    LiteralExpression(SyntaxKind.NumericLiteralExpression, node.Token)
-                );
-
-                var semicolon = Token(SyntaxKind.SemicolonToken);
-
-                return PropertyDeclaration(attributeLists, modifiers, type, null, identifierToken, null,
-                        arrowExpressionClauseSyntax, null, semicolon)
-                    .WithLeadingTrivia(DoubleEndOfLineTrivia());
-            }
-            else return null;
-        }
-
-        [CanBeNull]
-        internal static MethodDeclarationSyntax GetParentMethod(this SyntaxNode node)
-        {
-            var parentNode = node.Parent;
-            while (parentNode is not MethodDeclarationSyntax && parentNode != null)
-            {
-                parentNode = parentNode.Parent;
-            }
-            return parentNode as MethodDeclarationSyntax;
-        }
-        
-        [CanBeNull]
-        internal static ClassDeclarationSyntax GetParentClass(this SyntaxNode node)
-        {
-            var parentNode = node.Parent;
-            while (parentNode is not ClassDeclarationSyntax && parentNode != null)
-            {
-                parentNode = parentNode.Parent;
-            }
-            return parentNode as ClassDeclarationSyntax;
-        }
-
-        internal static ParameterSyntax GetParentParameter(this SyntaxNode node)
-        {
-            var parentNode = node.Parent;
-            while (parentNode is not ParameterSyntax && parentNode != null)
-            {
-                parentNode = parentNode.Parent;
-            }
-            return parentNode as ParameterSyntax;
-        }
-
-        internal static T GetParent<T>(this SyntaxNode node) where T : SyntaxNode
-        {
-            var parentNode = node.Parent;
-            while (parentNode is not T && parentNode != null)
-            {
-                parentNode = parentNode.Parent;
-            }
-
-            return parentNode as T;
+            return parentMethodIsStatic || node.IsWithin<ClassDeclarationSyntax>();
         }
     }
 }

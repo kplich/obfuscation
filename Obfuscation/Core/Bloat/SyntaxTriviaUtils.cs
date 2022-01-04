@@ -17,17 +17,5 @@ namespace Obfuscation.Core.Bloat
             var whitespaceString = " ".Repeat(numberOfTabs * spacesInTab);
             return new SyntaxTriviaList(SyntaxTrivia(SyntaxKind.WhitespaceTrivia, whitespaceString));
         }
-
-        public static SyntaxTriviaList EndOfLineTrivia()
-        {
-            return new SyntaxTriviaList(SyntaxTrivia(SyntaxKind.EndOfLineTrivia, "\n"));
-        }
-        
-        public static SyntaxTriviaList DoubleEndOfLineTrivia()
-        {
-            return new SyntaxTriviaList(
-                SyntaxTrivia(SyntaxKind.EndOfLineTrivia, "\n"),
-                SyntaxTrivia(SyntaxKind.EndOfLineTrivia, "\n"));
-        }
     }
 }

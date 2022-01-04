@@ -30,25 +30,25 @@ namespace Obfuscation.Core.Bloat
         private ClassDeclarationSyntax GenerateClass()
         {
             var randomName = _identifierGenerator.TransformName(string.Empty);
-            var trailingWhitespaces = EndOfLineTrivia();
+            var trailingWhitespaces = SyntaxTriviaList.Create(CarriageReturn);
 
             var identifierToken = Identifier(SyntaxTriviaList.Empty, randomName, trailingWhitespaces);
 
             return ClassDeclaration(identifierToken)
-                .WithTrailingTrivia(EndOfLineTrivia())
+                .WithTrailingTrivia(CarriageReturn)
                 .WithKeyword(Token(SyntaxKind.ClassKeyword)
                     .WithLeadingTrivia(TabulatorTrivia(1))
                     .WithTrailingTrivia(SpaceTrivia()))
                 .WithOpenBraceToken(
                     Token(SyntaxKind.OpenBraceToken)
                         .WithLeadingTrivia(TabulatorTrivia(1))
-                        .WithTrailingTrivia(EndOfLineTrivia()))
+                        .WithTrailingTrivia(CarriageReturn))
                 .WithCloseBraceToken(
                     Token(SyntaxKind.CloseBraceToken)
                         .WithLeadingTrivia(TabulatorTrivia(1))
-                        .WithTrailingTrivia(EndOfLineTrivia())
+                        .WithTrailingTrivia(CarriageReturn)
                 )
-                .WithTrailingTrivia(EndOfLineTrivia())
+                .WithTrailingTrivia(CarriageReturn)
                 .AddMembers(GeneratePrimitiveProperty());
         }
 
@@ -76,7 +76,7 @@ namespace Obfuscation.Core.Bloat
                     AccessorDeclaration(SyntaxKind.SetAccessorDeclaration)
                         .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
                         .WithTrailingTrivia(SpaceTrivia()))
-                .WithTrailingTrivia(EndOfLineTrivia());
+                .WithTrailingTrivia(CarriageReturn);
         }
     }
 }
