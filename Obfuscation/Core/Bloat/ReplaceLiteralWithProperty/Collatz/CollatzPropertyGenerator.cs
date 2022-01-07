@@ -4,12 +4,13 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Obfuscation.Core.Bloat.Property;
 using Obfuscation.Utils;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Obfuscation.Core.Bloat.SyntaxTriviaUtils;
 using static Obfuscation.Utils.SyntaxGenerationUtils;
 
-namespace Obfuscation.Core.Bloat.Property.Collatz
+namespace Obfuscation.Core.Bloat.ReplaceLiteralWithProperty.Collatz
 {
     public class CollatzPropertyGenerator : IPropertyGenerator
     {

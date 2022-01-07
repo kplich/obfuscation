@@ -13,4 +13,8 @@
       <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.11.0" />
       <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="3.11.0" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Core\Bloat\Property\Collatz" />
+    </ItemGroup>
 </Project>

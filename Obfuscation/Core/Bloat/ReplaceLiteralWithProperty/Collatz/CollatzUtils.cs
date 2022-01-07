@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Obfuscation.Core.Bloat.Property.Collatz
+namespace Obfuscation.Core.Bloat.ReplaceLiteralWithProperty.Collatz
 {
     public static class CollatzUtils
     {

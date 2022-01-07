@@ -5,15 +5,15 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Obfuscation.Core.Bloat.Property.Collatz;
 using Obfuscation.Core.Name;
 using Obfuscation.Utils;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Obfuscation.Core.Bloat.SyntaxTriviaUtils;
+using static Obfuscation.Core.DoNotObfuscate;
 
-namespace Obfuscation.Core.Bloat
+namespace Obfuscation.Core.Bloat.ReplaceLiteralWithProperty.Collatz
 {
-    public class NumericLiteralReplacer : CSharpSyntaxRewriter
+    public class ReplaceLiteralWithCollatzProperty : CSharpSyntaxRewriter
     {
         private class LiteralExpressionInfo
         {
@@ -28,7 +28,7 @@ namespace Obfuscation.Core.Bloat
         private readonly IDictionary<string, LiteralExpressionInfo> _mapOfLiterals =
             new Dictionary<string, LiteralExpressionInfo>();
 
-        public NumericLiteralReplacer(IImmutableList<IIdentifierGenerator> generators)
+        public ReplaceLiteralWithCollatzProperty(IImmutableList<IIdentifierGenerator> generators)
         {
             _identifierGenerators = generators;
             _doNotObfuscateAttributeName = ChooseGenerator().TransformClassName(string.Empty);
@@ -37,13 +37,7 @@ namespace Obfuscation.Core.Bloat
 
         public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            if (node.ContainsAttributeWithName(_doNotObfuscateAttributeName)) return base.VisitClassDeclaration(node);
-
-            // find collatz function or create it if it doesn't exist
-
-            // if the number is small, obfuscate it as the first smallest/greatest collatz sequence length
-            // if the number is big, obfuscate it as the number with the shortest/longest collatz sequence length
-            // if it's negative, return it as positive and multiplied by -1
+            if (node.HasAnAttributeWithName(_doNotObfuscateAttributeName)) return base.VisitClassDeclaration(node);
 
             var numericLiterals = node.DescendantNodes().OfType<LiteralExpressionSyntax>()
                 .Where(syntaxNode => syntaxNode.Kind() == SyntaxKind.NumericLiteralExpression);
@@ -63,9 +57,9 @@ namespace Obfuscation.Core.Bloat
 
             var propertyGenerator = new CollatzPropertyGenerator(_collatzFunctionName, _doNotObfuscateAttributeName);
 
-            var doNotObfuscateAttribute = generateDoNotObfuscateAttribute(_doNotObfuscateAttributeName);
+            var doNotObfuscateAttribute = GenerateDoNotObfuscateAttribute(_doNotObfuscateAttributeName);
 
-            MemberDeclarationSyntax[] literalsAsProperties =
+            var literalsAsProperties =
                 _mapOfLiterals
                     .Values
                     .Select(literalInfo =>
@@ -92,17 +86,6 @@ namespace Obfuscation.Core.Bloat
         public IIdentifierGenerator ChooseGenerator()
         {
             return _identifierGenerators[new Random().Next(_identifierGenerators.Count)];
-        }
-
-        private MemberDeclarationSyntax generateDoNotObfuscateAttribute(string attributeName)
-        {
-            return ParseMemberDeclaration($"public class {attributeName} : Attribute " + "{}")
-                .WithAttributeLists(new SyntaxList<AttributeListSyntax>(
-                    AttributeList(
-                        new SeparatedSyntaxList<AttributeSyntax>().Add(Attribute(IdentifierName(attributeName)))
-                    ).WithTrailingTrivia(CarriageReturn)
-                ))
-                .WithTrailingTrivia(CarriageReturn, CarriageReturn);
         }
 
         private static MethodDeclarationSyntax GenerateCollatzCalculatingFunction(string collatzFunctionName,
@@ -178,30 +161,6 @@ namespace Obfuscation.Core.Bloat
             );
 
             return methodDeclaration;
-        }
-    }
-
-    internal static class NumericLiteralReplacerUtils
-    {
-        internal static bool ContainsAttributeWithName(this ClassDeclarationSyntax node, string attributeName)
-        {
-            return node.AttributeLists.Any(list =>
-            {
-                return list.Attributes.Any(attribute => attribute.Name.ToString().Contains(attributeName));
-            });
-        }
-
-        internal static bool IsOfNumericType(this LiteralExpressionSyntax node)
-        {
-            return node.Kind() == SyntaxKind.NumericLiteralExpression;
-        }
-
-        internal static bool NeedsToBeStatic(this LiteralExpressionSyntax node)
-        {
-            var parentMethod = node.GetParent<MethodDeclarationSyntax>();
-            var parentMethodIsStatic = parentMethod?.IsStatic() ?? false;
-
-            return parentMethodIsStatic || node.IsWithin<ClassDeclarationSyntax>();
         }
     }
 }

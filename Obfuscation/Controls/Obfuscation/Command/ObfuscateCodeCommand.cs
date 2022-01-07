@@ -2,6 +2,7 @@
 using System.Windows.Input;
 using Microsoft.CodeAnalysis.CSharp;
 using Obfuscation.Core.Bloat;
+using Obfuscation.Core.Bloat.ReplaceLiteralWithProperty.Plain;
 using Obfuscation.Core.Rename;
 
 namespace Obfuscation.Controls.Obfuscation.Command
@@ -57,7 +58,7 @@ namespace Obfuscation.Controls.Obfuscation.Command
             obfuscatedCode = newRoot.ToFullString();*/
 
             var syntaxTree2 = CSharpSyntaxTree.ParseText(obfuscatedCode);
-            var newRoot2 = new NumericLiteralReplacer(identifierGenerators).Visit(await syntaxTree2.GetRootAsync());
+            var newRoot2 = new ReplaceLiteralWithPlainProperty(identifierGenerators).Visit(await syntaxTree2.GetRootAsync());
             obfuscatedCode = newRoot2.ToFullString();
 
             _viewModel.Code.Obfuscated = obfuscatedCode;
