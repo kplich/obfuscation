@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Windows.Input;
 using Microsoft.CodeAnalysis.CSharp;
-using Obfuscation.Core.Bloat;
-using Obfuscation.Core.Bloat.ReplaceLiteralWithProperty.Plain;
+using Obfuscation.Core.Bloat.Property;
+using Obfuscation.Core.Bloat.ReplaceLiteralWithProperty;
+using Obfuscation.Core.Bloat.ReplaceLiteralWithProperty.Collatz;
+using Obfuscation.Core.Name;
 using Obfuscation.Core.Rename;
+using Obfuscation.Utils;
 
 namespace Obfuscation.Controls.Obfuscation.Command
 {
@@ -58,7 +63,16 @@ namespace Obfuscation.Controls.Obfuscation.Command
             obfuscatedCode = newRoot.ToFullString();*/
 
             var syntaxTree2 = CSharpSyntaxTree.ParseText(obfuscatedCode);
-            var newRoot2 = new ReplaceLiteralWithPlainProperty(identifierGenerators).Visit(await syntaxTree2.GetRootAsync());
+            
+            var doNotObfuscateAttributeName = IIdentifierGenerator.AllGenerators().GetRandomElement()
+                .TransformClassName(string.Empty);
+
+            var propertyGenerators = new List<PropertyGenerator>
+            {
+                new CollatzPropertyGenerator(identifierGenerators, doNotObfuscateAttributeName)
+            }.ToImmutableList();
+
+            var newRoot2 = new ReplaceLiteralWithProperty(identifierGenerators, propertyGenerators).Visit(await syntaxTree2.GetRootAsync());
             obfuscatedCode = newRoot2.ToFullString();
 
             _viewModel.Code.Obfuscated = obfuscatedCode;

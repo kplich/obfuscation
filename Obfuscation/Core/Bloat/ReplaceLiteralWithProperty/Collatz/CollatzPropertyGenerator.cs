@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Obfuscation.Core.Bloat.Property;
+using Obfuscation.Core.Name;
 using Obfuscation.Utils;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Obfuscation.Core.Bloat.SyntaxTriviaUtils;
@@ -12,22 +14,45 @@ using static Obfuscation.Utils.SyntaxGenerationUtils;
 
 namespace Obfuscation.Core.Bloat.ReplaceLiteralWithProperty.Collatz
 {
-    public class CollatzPropertyGenerator : IPropertyGenerator
+    public class CollatzPropertyGenerator : PropertyGenerator
     {
         private readonly string _collatzFunctionName;
         private readonly string _doNotObfuscateAttributeName;
 
-        public CollatzPropertyGenerator(string collatzFunctionName, string doNotObfuscateAttributeName)
+        public CollatzPropertyGenerator(IImmutableList<IIdentifierGenerator> identifierGenerators, string doNotObfuscateAttributeName) : base(identifierGenerators)
         {
-            _collatzFunctionName = collatzFunctionName;
+            _collatzFunctionName = ChooseGenerator().TransformMethodName(string.Empty);
             _doNotObfuscateAttributeName = doNotObfuscateAttributeName;
         }
 
-        public PropertyDeclarationSyntax GenerateProperty(LiteralExpressionSyntax literal, string newName)
+        public override bool SupportsNumericLiterals()
         {
-            if (!literal.IsOfNumericType()) return null;
+            return true;
+        }
+        
+        public override ClassDeclarationSyntax PrepareClass(ClassDeclarationSyntax classDeclaration)
+        {
+            if (classDeclaration.Members.OfType<MethodDeclarationSyntax>()
+                .Any(method => method.Identifier.Text == _collatzFunctionName))
+            {
+                return classDeclaration;
+            }
+            else
+            {
+                return classDeclaration.AddMembers(
+                    GenerateCollatzCalculatingFunction(_collatzFunctionName, _doNotObfuscateAttributeName)
+                );
+            }
+        }
 
-            var attributeLists = AttributeListWithSingleAttribute(_doNotObfuscateAttributeName);
+        public override PropertyDeclarationSyntax GenerateProperty(LiteralExpressionSyntax literal)
+        {
+            if (!Supports(literal)) return null;
+
+            var newName = ChooseGenerator().TransformName(string.Empty);
+
+            // var attributeLists = AttributeListWithSingleAttribute(_doNotObfuscateAttributeName);
+            var attributeLists = EmptyAttributeList();
             var modifiers = new SyntaxTokenList(
                 Token(SyntaxKind.PublicKeyword)
                     .WithLeadingTrivia(TabulatorTrivia(2))
@@ -286,6 +311,77 @@ namespace Obfuscation.Core.Bloat.ReplaceLiteralWithProperty.Collatz
                 ),
                 ReturnStatement(ParseExpression($"{arrayName}[index]").WithLeadingTrivia(Space)).WithTrailingTrivia(CarriageReturn)
             ).WithTrailingTrivia(CarriageReturn);
+        }
+        
+        private static MethodDeclarationSyntax GenerateCollatzCalculatingFunction(string collatzFunctionName,
+            string doNotObfuscateAttributeName)
+        {
+            // TODO: obfuscate parameter names
+            
+            //var attributeLists = AttributeListWithSingleAttribute(doNotObfuscateAttributeName);
+            var attributeLists = EmptyAttributeList();
+            
+            var modifiers = new SyntaxTokenList(
+                Token(SyntaxKind.PublicKeyword)
+                    .WithLeadingTrivia(TabulatorTrivia(2))
+                    .WithTrailingTrivia(SpaceTrivia()),
+                Token(SyntaxKind.StaticKeyword).WithTrailingTrivia(SpaceTrivia())
+            );
+
+            var returnType = PredefinedType(Token(SyntaxKind.IntKeyword)).WithTrailingTrivia(Space);
+
+            var identifier = Identifier(collatzFunctionName);
+
+            var parameters = new SeparatedSyntaxList<ParameterSyntax>();
+            var parameterList = ParameterList(parameters.Add(Parameter(
+                new SyntaxList<AttributeListSyntax>(),
+                new SyntaxTokenList(),
+                PredefinedType(Token(SyntaxKind.IntKeyword).WithTrailingTrivia(SpaceTrivia())),
+                Identifier("x"),
+                null)));
+
+            var constraintClauses = new SyntaxList<TypeParameterConstraintClauseSyntax>();
+
+            var body = Block(
+                ParseStatement("var length = 0;").WithTrailingTrivia(CarriageReturn, CarriageReturn),
+                ParseStatement("var temp = x;")
+                    .WithTrailingTrivia(CarriageReturn),
+                WhileStatement(ParseExpression("temp > 1"),
+                    Block(
+                        ParseStatement("length++;")
+                            .WithTrailingTrivia(CarriageReturn, CarriageReturn),
+                        IfStatement(ParseExpression("temp % 2 == 0"),
+                            Block(
+                                ParseStatement("temp /= 2;").WithTrailingTrivia(CarriageReturn)
+                            ).WithTrailingTrivia(CarriageReturn),
+                            ElseClause(
+                                Block(
+                                    ParseStatement("temp *= 3;").WithTrailingTrivia(CarriageReturn),
+                                    ParseStatement("temp += 1;").WithTrailingTrivia(CarriageReturn)
+                                )
+                            )
+                        ).WithTrailingTrivia(CarriageReturn)
+                    ).WithTrailingTrivia(CarriageReturn)
+                ).WithTrailingTrivia(CarriageReturn),
+                ReturnStatement(
+                    ParseExpression("length + 1").WithLeadingTrivia(Space)
+                ).WithTrailingTrivia(CarriageReturn)
+            ).WithTrailingTrivia(CarriageReturn);
+
+            var methodDeclaration = MethodDeclaration(
+                attributeLists,
+                modifiers,
+                returnType,
+                null,
+                identifier,
+                null,
+                parameterList,
+                constraintClauses,
+                body,
+                null
+            );
+
+            return methodDeclaration;
         }
     }
 }

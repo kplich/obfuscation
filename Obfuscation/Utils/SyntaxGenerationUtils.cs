@@ -16,6 +16,11 @@ namespace Obfuscation.Utils
                     new SeparatedSyntaxList<AttributeSyntax>().Add(Attribute(IdentifierName(attributeName)))
                 ).WithTrailingTrivia(CarriageReturn));
         }
+
+        public static SyntaxList<AttributeListSyntax> EmptyAttributeList()
+        {
+            return new SyntaxList<AttributeListSyntax>();
+        }
         
         public static ForStatementSyntax ArrayBasedForLoop(string loopIndexName, string arrayName, BlockSyntax block)
         {
