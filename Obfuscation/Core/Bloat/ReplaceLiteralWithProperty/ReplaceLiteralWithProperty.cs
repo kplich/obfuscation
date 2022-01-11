@@ -1,23 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Obfuscation.Core.Bloat.Property;
-using Obfuscation.Core.Name;
 using Obfuscation.Utils;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Obfuscation.Core.Bloat.SyntaxTriviaUtils;
-using static Obfuscation.Core.DoNotObfuscate;
 
 namespace Obfuscation.Core.Bloat.ReplaceLiteralWithProperty
 {
     public class ReplaceLiteralWithProperty : CSharpSyntaxRewriter
     {
-        private readonly IImmutableList<IIdentifierGenerator> _identifierGenerators;
-        // private readonly string _doNotObfuscateAttributeName; // TODO: how should this be used???
+        private readonly string _doNotObfuscateAttributeName; // TODO: how should this be used???
 
         private readonly IImmutableList<PropertyGenerator> _propertyGenerators;
 
@@ -26,15 +21,15 @@ namespace Obfuscation.Core.Bloat.ReplaceLiteralWithProperty
 
         private readonly IList<PropertyGenerator> _generatorsUsed = new List<PropertyGenerator>();
 
-        public ReplaceLiteralWithProperty(IImmutableList<IIdentifierGenerator> identifierGenerators, IImmutableList<PropertyGenerator> propertyGenerators)
+        public ReplaceLiteralWithProperty(IImmutableList<PropertyGenerator> propertyGenerators, string doNotObfuscateAttributeName)
         {
-            _identifierGenerators = identifierGenerators;
             _propertyGenerators = propertyGenerators;
+            _doNotObfuscateAttributeName = doNotObfuscateAttributeName;
         }
 
         public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            // if (node.HasAnAttributeWithName(_doNotObfuscateAttributeName)) return base.VisitClassDeclaration(node);
+            if (node.HasAnAttributeWithName(_doNotObfuscateAttributeName)) return base.VisitClassDeclaration(node);
 
             var literals = node.DescendantNodes().OfType<LiteralExpressionSyntax>();
 
@@ -60,17 +55,17 @@ namespace Obfuscation.Core.Bloat.ReplaceLiteralWithProperty
                 .Aggregate(node, (current, generator) => generator.PrepareClass(current));
 
             return base.VisitClassDeclaration(
-                preparedClass.AddMembers(properties)
-                    );
-
+                preparedClass
+                    .AddDoNotObfuscateAttribute(_doNotObfuscateAttributeName)
+                    .AddMembers(properties));
         }
 
         public override SyntaxNode VisitLiteralExpression(LiteralExpressionSyntax node)
         {
-            /*if (node.HasAParentWithAttributeName(_doNotObfuscateAttributeName))
+            if (node.HasAParentWithAttributeName(_doNotObfuscateAttributeName))
             {
                 return base.VisitLiteralExpression(node);
-            }*/
+            }
 
             if (!_literalsAndProperties.ContainsKey(node.Token.Text))
             {
@@ -79,11 +74,6 @@ namespace Obfuscation.Core.Bloat.ReplaceLiteralWithProperty
 
             var property = _literalsAndProperties[node.Token.Text];
             return IdentifierName(property.Identifier).WithTrailingTrivia(SpaceTrivia());
-        }
-
-        public IIdentifierGenerator ChooseGenerator()
-        {
-            return _identifierGenerators[new Random().Next(_identifierGenerators.Count)];
         }
     }
     

@@ -5,7 +5,6 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Obfuscation.Core.Bloat.Property;
 using Obfuscation.Core.Name;
 using Obfuscation.Utils;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -17,12 +16,10 @@ namespace Obfuscation.Core.Bloat.ReplaceLiteralWithProperty.Collatz
     public class CollatzPropertyGenerator : PropertyGenerator
     {
         private readonly string _collatzFunctionName;
-        private readonly string _doNotObfuscateAttributeName;
 
-        public CollatzPropertyGenerator(IImmutableList<IIdentifierGenerator> identifierGenerators, string doNotObfuscateAttributeName) : base(identifierGenerators)
+        public CollatzPropertyGenerator(IImmutableList<IIdentifierGenerator> identifierGenerators, string doNotObfuscateAttributeName) : base(identifierGenerators, doNotObfuscateAttributeName)
         {
             _collatzFunctionName = ChooseGenerator().TransformMethodName(string.Empty);
-            _doNotObfuscateAttributeName = doNotObfuscateAttributeName;
         }
 
         public override bool SupportsNumericLiterals()
@@ -40,7 +37,7 @@ namespace Obfuscation.Core.Bloat.ReplaceLiteralWithProperty.Collatz
             else
             {
                 return classDeclaration.AddMembers(
-                    GenerateCollatzCalculatingFunction(_collatzFunctionName, _doNotObfuscateAttributeName)
+                    GenerateCollatzCalculatingFunction(_collatzFunctionName, DoNotObfuscateAttributeName)
                 );
             }
         }
@@ -51,8 +48,7 @@ namespace Obfuscation.Core.Bloat.ReplaceLiteralWithProperty.Collatz
 
             var newName = ChooseGenerator().TransformName(string.Empty);
 
-            // var attributeLists = AttributeListWithSingleAttribute(_doNotObfuscateAttributeName);
-            var attributeLists = EmptyAttributeList();
+            var attributeLists = AttributeListWithSingleAttribute(DoNotObfuscateAttributeName);
             var modifiers = new SyntaxTokenList(
                 Token(SyntaxKind.PublicKeyword)
                     .WithLeadingTrivia(TabulatorTrivia(2))
@@ -318,9 +314,8 @@ namespace Obfuscation.Core.Bloat.ReplaceLiteralWithProperty.Collatz
         {
             // TODO: obfuscate parameter names
             
-            //var attributeLists = AttributeListWithSingleAttribute(doNotObfuscateAttributeName);
-            var attributeLists = EmptyAttributeList();
-            
+            var attributeLists = AttributeListWithSingleAttribute(doNotObfuscateAttributeName);
+
             var modifiers = new SyntaxTokenList(
                 Token(SyntaxKind.PublicKeyword)
                     .WithLeadingTrivia(TabulatorTrivia(2))

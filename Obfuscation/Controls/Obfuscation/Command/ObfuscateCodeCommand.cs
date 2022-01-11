@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Windows.Input;
 using Microsoft.CodeAnalysis.CSharp;
-using Obfuscation.Core.Bloat.Property;
 using Obfuscation.Core.Bloat.ReplaceLiteralWithProperty;
 using Obfuscation.Core.Bloat.ReplaceLiteralWithProperty.Collatz;
+using Obfuscation.Core.Bloat.ReplaceLiteralWithProperty.Plain;
 using Obfuscation.Core.Name;
 using Obfuscation.Core.Rename;
 using Obfuscation.Utils;
@@ -69,10 +69,11 @@ namespace Obfuscation.Controls.Obfuscation.Command
 
             var propertyGenerators = new List<PropertyGenerator>
             {
+                new PlainPropertyGenerator(identifierGenerators, doNotObfuscateAttributeName),
                 new CollatzPropertyGenerator(identifierGenerators, doNotObfuscateAttributeName)
             }.ToImmutableList();
 
-            var newRoot2 = new ReplaceLiteralWithProperty(identifierGenerators, propertyGenerators).Visit(await syntaxTree2.GetRootAsync());
+            var newRoot2 = new ReplaceLiteralWithProperty(propertyGenerators, doNotObfuscateAttributeName).Visit(await syntaxTree2.GetRootAsync());
             obfuscatedCode = newRoot2.ToFullString();
 
             _viewModel.Code.Obfuscated = obfuscatedCode;

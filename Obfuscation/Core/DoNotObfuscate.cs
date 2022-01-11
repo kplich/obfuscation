@@ -15,7 +15,7 @@ namespace Obfuscation.Core
                 .WithTrailingTrivia(CarriageReturn, CarriageReturn);
         }
 
-        public static ClassDeclarationSyntax WithDoNotObfuscateAttribute(this ClassDeclarationSyntax classDeclarationSyntax, string attributeName)
+        public static ClassDeclarationSyntax AddDoNotObfuscateAttribute(this ClassDeclarationSyntax classDeclarationSyntax, string attributeName)
         {
             return classDeclarationSyntax.AddMembers(
                 GenerateDoNotObfuscateAttribute(attributeName)

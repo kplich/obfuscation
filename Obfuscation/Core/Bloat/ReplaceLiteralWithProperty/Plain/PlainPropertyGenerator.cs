@@ -2,16 +2,16 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Obfuscation.Core.Bloat.Property;
 using Obfuscation.Core.Name;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Obfuscation.Core.Bloat.SyntaxTriviaUtils;
+using static Obfuscation.Utils.SyntaxGenerationUtils;
 
 namespace Obfuscation.Core.Bloat.ReplaceLiteralWithProperty.Plain
 {
     public class PlainPropertyGenerator : PropertyGenerator
     {
-        public PlainPropertyGenerator(IImmutableList<IIdentifierGenerator> identifierGenerators) : base(identifierGenerators)
+        public PlainPropertyGenerator(IImmutableList<IIdentifierGenerator> identifierGenerators, string doNotObfuscateAttributeName) : base(identifierGenerators, doNotObfuscateAttributeName)
         {
         }
         
@@ -21,7 +21,7 @@ namespace Obfuscation.Core.Bloat.ReplaceLiteralWithProperty.Plain
 
             var newName = ChooseGenerator().TransformName(string.Empty);
             
-            var attributeLists = new SyntaxList<AttributeListSyntax>();
+            var attributeLists = AttributeListWithSingleAttribute(DoNotObfuscateAttributeName);
             var modifiers = new SyntaxTokenList(
                 Token(SyntaxKind.PublicKeyword)
                     .WithLeadingTrivia(TabulatorTrivia(2))
@@ -49,6 +49,11 @@ namespace Obfuscation.Core.Bloat.ReplaceLiteralWithProperty.Plain
             return PropertyDeclaration(attributeLists, modifiers, type, null, identifierToken, null,
                     arrowExpressionClauseSyntax, null, semicolon)
                 .WithTrailingTrivia(CarriageReturn, CarriageReturn);
+        }
+        
+        public override bool SupportsNumericLiterals()
+        {
+            return true;
         }
 
         public override ClassDeclarationSyntax PrepareClass(ClassDeclarationSyntax classDeclaration)
