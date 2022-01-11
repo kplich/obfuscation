@@ -56,7 +56,6 @@ namespace Obfuscation.Core.Bloat.ReplaceLiteralWithProperty
 
             return base.VisitClassDeclaration(
                 preparedClass
-                    .AddDoNotObfuscateAttribute(_doNotObfuscateAttributeName)
                     .AddMembers(properties));
         }
 

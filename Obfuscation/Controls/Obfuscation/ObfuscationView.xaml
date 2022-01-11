@@ -27,6 +27,19 @@
                        TextWrapping="Wrap">
                 Obfuscation options
             </TextBlock>
+            <Expander Header="Name generation strategies" Margin="5">
+                <ListBox Margin="5"
+                         ItemsSource="{Binding Options.IdentifierGenerators, Mode=OneWay}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding Value, Mode=TwoWay}"
+                                      Content="{Binding Key.DisplayName, Mode=OneWay}"
+                                      Margin="5" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Expander>
+            <Separator Margin="5" />
             <Expander Header="Renaming targets" Margin="5">
                 <StackPanel Margin="5">
                     <CheckBox IsChecked="{Binding Options.RenameClasses}" Margin="5">
@@ -41,20 +54,27 @@
                 </StackPanel>
             </Expander>
             <Separator Margin="5" />
-            <Expander Header="Name generation" Margin="5">
-                <ListBox Margin="5"
-                         ItemsSource="{Binding Options.IdentifierGenerationStrategies, Mode=OneWay}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <CheckBox IsChecked="{Binding Value, Mode=TwoWay}"
-                                      Content="{Binding Key.DisplayName, Mode=OneWay}"
-                                      Margin="5">
-                            </CheckBox>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+            <Expander Header="Class bloating" Margin="5" IsExpanded="True">
+                <StackPanel>
+                    <Label Margin="5">Replace literals with properties</Label>
+                    <ListBox Margin="5"
+                             ItemsSource="{Binding Options.PropertyGeneratorBuilders, Mode=OneWay}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding Value, Mode=TwoWay}"
+                                          Content="{Binding Key.DisplayName, Mode=OneWay}"
+                                          Margin="5" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <Separator Margin="5" />
+                    <CheckBox IsChecked="{Binding Options.BloatWithClasses}"
+                              Margin="5">
+                        Bloat with classes
+                    </CheckBox>
+                </StackPanel>
+                
             </Expander>
-            <Separator Margin="5" />
         </StackPanel>
 
         <DockPanel Grid.Column="1"

@@ -42,10 +42,10 @@ namespace Obfuscation.Core.Rename
                 "MyAssembly", "C#", metadataReferences: references);
             var project = workspace.AddProject(projectInfo);
             var document = workspace.AddDocument(project.Id, "MyDocument.cs", SourceText.From(code));
-            Compilation compilation = await document.Project.GetCompilationAsync();
-            SyntaxTree syntaxTree = compilation.SyntaxTrees.First();
-            SemanticModel semanticModel = compilation.GetSemanticModel(syntaxTree);
-            Solution solution = workspace.CurrentSolution;
+            var compilation = await document.Project.GetCompilationAsync();
+            var syntaxTree = compilation.SyntaxTrees.First();
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var solution = workspace.CurrentSolution;
 
             if (IdentifierGeneratorsAreProvided)
             {

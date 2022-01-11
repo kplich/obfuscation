@@ -3,18 +3,30 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Obfuscation.Core.Name;
+using Obfuscation.Utils;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Obfuscation.Core.Bloat.SyntaxTriviaUtils;
 using static Obfuscation.Utils.SyntaxGenerationUtils;
 
 namespace Obfuscation.Core.Bloat.ReplaceLiteralWithProperty.Plain
 {
-    public class PlainPropertyGenerator : PropertyGenerator
+    public sealed class PlainPropertyGenerator : PropertyGenerator
     {
-        public PlainPropertyGenerator(IImmutableList<IIdentifierGenerator> identifierGenerators, string doNotObfuscateAttributeName) : base(identifierGenerators, doNotObfuscateAttributeName)
+        private class PlainPropertyGeneratorBuilder : IBuilder<PlainPropertyGenerator>
+        {
+            public string DisplayName => "Plain property generator";
+            public PlainPropertyGenerator Build(IImmutableList<IIdentifierGenerator> identifierGenerators, string doNotObfuscateAttributeName)
+            {
+                return new PlainPropertyGenerator(identifierGenerators, doNotObfuscateAttributeName);
+            }
+        }
+
+        private PlainPropertyGenerator(IImmutableList<IIdentifierGenerator> identifierGenerators, string doNotObfuscateAttributeName) : base(identifierGenerators, doNotObfuscateAttributeName)
         {
         }
-        
+
+        public override string DisplayName => "Plain property generator";
+
         public override PropertyDeclarationSyntax GenerateProperty(LiteralExpressionSyntax literal)
         {
             if (!literal.IsOfNumericType()) return null;
@@ -58,6 +70,11 @@ namespace Obfuscation.Core.Bloat.ReplaceLiteralWithProperty.Plain
 
         public override ClassDeclarationSyntax PrepareClass(ClassDeclarationSyntax classDeclaration)
         {
+            if (classDeclaration.DoesNotContainAnAttributeWithName(DoNotObfuscateAttributeName))
+            {
+                classDeclaration = classDeclaration.AddDoNotObfuscateAttribute(DoNotObfuscateAttributeName);
+            }
+
             return classDeclaration;
         }
     }

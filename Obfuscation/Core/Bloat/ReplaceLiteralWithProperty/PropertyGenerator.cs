@@ -3,11 +3,24 @@ using System.Collections.Immutable;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Obfuscation.Core.Name;
+using Obfuscation.Utils;
 
 namespace Obfuscation.Core.Bloat.ReplaceLiteralWithProperty
 {
-    public abstract class PropertyGenerator
+    public abstract class PropertyGenerator : IWithDisplayName
     {
+        public interface IBuilder<out T> : IWithDisplayName where T: PropertyGenerator
+        {
+            public static IImmutableList<IBuilder<PropertyGenerator>> AllPropertyGeneratorBuilders()
+            {
+                return AllInstances.OfType<IBuilder<PropertyGenerator>>();
+            }
+
+            public new string DisplayName { get; }
+
+            public T Build(IImmutableList<IIdentifierGenerator> identifierGenerators, string doNotObfuscateAttributeName);
+        }
+
         private readonly IImmutableList<IIdentifierGenerator> _identifierGenerators;
         protected readonly string DoNotObfuscateAttributeName;
 
@@ -75,5 +88,7 @@ namespace Obfuscation.Core.Bloat.ReplaceLiteralWithProperty
                 _ => false
             };
         }
+
+        public abstract string DisplayName { get; }
     }
 }

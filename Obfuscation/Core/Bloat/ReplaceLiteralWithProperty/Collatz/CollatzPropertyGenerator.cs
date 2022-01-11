@@ -13,11 +13,20 @@ using static Obfuscation.Utils.SyntaxGenerationUtils;
 
 namespace Obfuscation.Core.Bloat.ReplaceLiteralWithProperty.Collatz
 {
-    public class CollatzPropertyGenerator : PropertyGenerator
+    public sealed class CollatzPropertyGenerator : PropertyGenerator
     {
+        private class CollatzPropertyGeneratorBuilder : IBuilder<CollatzPropertyGenerator>
+        {
+            public string DisplayName => "Collatz property generator";
+            public CollatzPropertyGenerator Build(IImmutableList<IIdentifierGenerator> identifierGenerators, string doNotObfuscateAttributeName)
+            {
+                return new CollatzPropertyGenerator(identifierGenerators, doNotObfuscateAttributeName);
+            }
+        }
+        
         private readonly string _collatzFunctionName;
 
-        public CollatzPropertyGenerator(IImmutableList<IIdentifierGenerator> identifierGenerators, string doNotObfuscateAttributeName) : base(identifierGenerators, doNotObfuscateAttributeName)
+        private CollatzPropertyGenerator(IImmutableList<IIdentifierGenerator> identifierGenerators, string doNotObfuscateAttributeName) : base(identifierGenerators, doNotObfuscateAttributeName)
         {
             _collatzFunctionName = ChooseGenerator().TransformMethodName(string.Empty);
         }
@@ -29,18 +38,21 @@ namespace Obfuscation.Core.Bloat.ReplaceLiteralWithProperty.Collatz
         
         public override ClassDeclarationSyntax PrepareClass(ClassDeclarationSyntax classDeclaration)
         {
-            if (classDeclaration.Members.OfType<MethodDeclarationSyntax>()
-                .Any(method => method.Identifier.Text == _collatzFunctionName))
+            if (classDeclaration.DoesNotContainAnAttributeWithName(DoNotObfuscateAttributeName))
             {
-                return classDeclaration;
+                classDeclaration = classDeclaration.AddDoNotObfuscateAttribute(DoNotObfuscateAttributeName);
             }
-            else
+
+            if (classDeclaration.Members.OfType<MethodDeclarationSyntax>().All(method => method.Identifier.Text != _collatzFunctionName))
             {
-                return classDeclaration.AddMembers(
-                    GenerateCollatzCalculatingFunction(_collatzFunctionName, DoNotObfuscateAttributeName)
-                );
+                classDeclaration = classDeclaration.AddMembers(
+                    GenerateCollatzCalculatingFunction(_collatzFunctionName, DoNotObfuscateAttributeName));
             }
+
+            return classDeclaration;
         }
+
+        public override string DisplayName => "Collatz property generator";
 
         public override PropertyDeclarationSyntax GenerateProperty(LiteralExpressionSyntax literal)
         {
@@ -300,7 +312,7 @@ namespace Obfuscation.Core.Bloat.ReplaceLiteralWithProperty.Collatz
                         IfStatement(ParseExpression("newLength < length"),
                             Block(
                                 ParseStatement("length = newLength;").WithTrailingTrivia(CarriageReturn),
-                                ParseStatement($"index = {loopIndexName}").WithTrailingTrivia(CarriageReturn)
+                                ParseStatement($"index = {loopIndexName};").WithTrailingTrivia(CarriageReturn)
                             ).WithLeadingTrivia(CarriageReturn).WithTrailingTrivia(CarriageReturn)
                         ).WithTrailingTrivia(CarriageReturn)
                     ).WithLeadingTrivia(CarriageReturn).WithTrailingTrivia(CarriageReturn)

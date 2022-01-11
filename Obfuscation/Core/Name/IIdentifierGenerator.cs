@@ -1,21 +1,13 @@
-﻿using System;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Reflection;
+﻿using System.Collections.Immutable;
+using Obfuscation.Utils;
 
 namespace Obfuscation.Core.Name
 {
     public interface IIdentifierGenerator
     {
-        public static ImmutableList<IIdentifierGenerator> AllGenerators()
+        public static ImmutableList<IIdentifierGenerator> AllIdentifierGenerators()
         {
-            var interfaceType = typeof(IIdentifierGenerator);
-            var assembly = Assembly.GetAssembly(interfaceType) ?? throw new Exception("Unable to get the assembly!");
-            var allTypes = assembly.GetTypes();
-            var whereIsSubclass = allTypes.Where(theType =>
-                theType.IsClass && !theType.IsAbstract && theType.GetInterfaces().Contains(interfaceType));
-            var selected = whereIsSubclass.Select(theType => Activator.CreateInstance(theType) as IIdentifierGenerator);
-            return selected.ToImmutableList();
+            return AllInstances.OfType<IIdentifierGenerator>();
         }
 
         public string DisplayName { get; }
