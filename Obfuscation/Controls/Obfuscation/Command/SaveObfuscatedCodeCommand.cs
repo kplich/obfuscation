@@ -1,6 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Input;
+using Microsoft.Win32;
 
 namespace Obfuscation.Controls.Obfuscation.Command
 {
@@ -22,7 +24,11 @@ namespace Obfuscation.Controls.Obfuscation.Command
 
         public void Execute(object parameter)
         {
-            MessageBox.Show(_viewModel.Code.Obfuscated, "Saved obfuscated code!");
+            var saveFileDialog = new SaveFileDialog();
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                File.WriteAllText(saveFileDialog.FileName, _viewModel.Code.Obfuscated);
+            }
         }
 
         public event EventHandler CanExecuteChanged
