@@ -3,38 +3,19 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:core="clr-namespace:Obfuscation.Core"
         xmlns:obfuscation="clr-namespace:Obfuscation.Controls.Obfuscation"
-        xmlns:analysis="clr-namespace:Obfuscation.Controls.Analysis"
         xmlns:local="clr-namespace:Obfuscation"
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="1200"
         WindowStyle="SingleBorderWindow"
         ResizeMode="CanResize"
-        Background="Gainsboro">
+        Background="#eeeeee">
     
     <Window.DataContext>
         <local:MainViewModel />
     </Window.DataContext>
     
     <Border>
-        <TabControl ItemsSource="{Binding Tabs}">
-            <TabControl.Resources>
-                <DataTemplate DataType="{x:Type obfuscation:ObfuscationViewModel}">
-                    <obfuscation:ObfuscationView />
-                </DataTemplate>
-                <DataTemplate DataType="{x:Type analysis:AnalysisViewModel}">
-                    <analysis:AnalysisView />
-                </DataTemplate>
-            </TabControl.Resources>
-            
-            <TabControl.ItemTemplate>
-                <DataTemplate DataType="{x:Type core:TabViewModel}">
-                    <TextBlock>
-                        <Run Text="{Binding Name}"></Run>
-                    </TextBlock>
-                </DataTemplate>
-            </TabControl.ItemTemplate>
-        </TabControl>
+        <obfuscation:ObfuscationView />
     </Border>
 </Window>
